@@ -23,13 +23,11 @@ import akka.sbt.AkkaKernelPlugin.{ Dist, outputDirectory, distJvmOptions, additi
 
 object MegamAkkaKernel extends Build {
 
-  val Organization = "org.megam"
-
-  val Version = "0.1.0-SNAPSHOT"
-
+   val Organization = "org.megam"
+  val Version      = "2.2-SNAPSHOT"
   val ScalaVersion = "2.10.1"
 
-  lazy val MegakAkkaKernel = Project(
+lazy val megamAkka = Project(
     id = "megam_akka",
     base = file("."),
     settings = Defaults.defaultSettings ++ AkkaKernelPlugin.distSettings ++ Seq(
@@ -38,26 +36,22 @@ object MegamAkkaKernel extends Build {
       additionalLibs in Dist := Seq(new java.io.File("lib/libsigar-amd64-linux-1.6.4.so")),
       outputDirectory in Dist := file("target/megam_akka")))
 
+
   lazy val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := Organization,
     version := Version,
     scalaVersion := ScalaVersion,
     crossPaths := false,
-    organizationName := "Typesafe Inc.",
-    organizationHomepage := Some(url("http://www.typesafe.com")))
+    organizationName := "Megam Systems.",
+    organizationHomepage := Some(url("http://www.megam.co")))
+
+
 
   lazy val defaultSettings = buildSettings ++ Seq(
-    resolvers += "Akka Snapshots" at "http://repo.akka.io/snapshots",
-    resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots",
-    resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-    resolvers += "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots",
-    resolvers += "Typesafe Repo" at "http://repo.typesafe.com/typesafe/releases",
-    resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/public",
-    resolvers += "Twitter Repo" at "http://maven.twttr.com",
-
       // compile options
       scalacOptions ++= Seq ("-encoding", "UTF-8", "-deprecation", "-unchecked"),
       javacOptions ++= Seq ("-Xlint:unchecked", "-Xlint:deprecation"))
+
 }
 
 object Dependencies {
@@ -74,20 +68,19 @@ object Dependency {
     val Akka = "2.2-SNAPSHOT"
     val scalaCheckVersion = "1.10.1"
     val scalazVersion = "7.0.0"
-    val zkVersion = "6.3.2"
     val liftJsonVersion = "2.5-RC5"
     val Zk = "6.3.2"
     val Mg = "0.1.0-SNAPSHOT"
   }
 
-  val akkaKernel = "com.typesafe.akka" % "akka-kernel_2.10" % V.Akka
-  val akkaSlf4j = "com.typesafe.akka" % "akka-slf4j_2.10" % V.Akka
-  val akkaActor = "com.typesafe.akka" % "akka-actor_2.10" % V.Akka
-  val akkaRemote = "com.typesafe.akka" % "akka-remote_2.10" % V.Akka
-  val akkaCluster = "com.typesafe.akka" % "akka-cluster-experimental_2.10" % V.Akka
+  val akkaKernel = "com.typesafe.akka" %% "akka-kernel" % V.Akka
+  val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % V.Akka
+  val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.Akka
+  val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
+  val akkaCluster = "com.typesafe.akka" %% "akka-cluster-experimental" % V.Akka
   val akkaLogback = "ch.qos.logback" % "logback-classic" % "1.0.11"
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
-  val zk = "com.twitter" % "util-zk-common" % V.zkVersion
+  val zk = "com.twitter" % "util-zk-common" % V.Zk
   val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg
   val scalaz = "org.scalaz" %% "scalaz-core" % V.scalazVersion
   val scalaz_effect = "org.scalaz" %% "scalaz-effect" % V.scalazVersion
