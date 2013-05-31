@@ -16,26 +16,20 @@
 
 import io.Source
 import java.io.PrintWriter
-import sbtrelease._
-import ReleasePlugin._
-import ReleaseKeys._
 import sbt._
 import Keys._
 import akka.sbt.AkkaKernelPlugin
 import akka.sbt.AkkaKernelPlugin.{ Dist, outputDirectory, distJvmOptions, additionalLibs }
 
-object MegCommonReleaseSteps {
+object MegamAkkaKernel extends Build {
 
-  val readme = "README.md"
+  val Organization = "org.megam"
 
-  lazy val setReadmeReleaseVersion: ReleaseStep = { st: State =>
-    val releaseVersions = getReleasedVersion(st)
-    updateReadme(st, releaseVersions._1)
-    commitReadme(st, releaseVersions._1)
-    st
-  }
-  
-   lazy val MegakAkkaKernel = Project(
+  val Version = "0.1.0-SNAPSHOT"
+
+  val ScalaVersion = "2.10.1"
+
+  lazy val MegakAkkaKernel = Project(
     id = "megam_akka",
     base = file("."),
     settings = Defaults.defaultSettings ++ AkkaKernelPlugin.distSettings ++ Seq(
@@ -44,27 +38,61 @@ object MegCommonReleaseSteps {
       additionalLibs in Dist := Seq(new java.io.File("lib/libsigar-amd64-linux-1.6.4.so")),
       outputDirectory in Dist := file("target/megam_akka")))
 
+  lazy val buildSettings = Defaults.defaultSettings ++ Seq(
+    organization := Organization,
+    version := Version,
+    scalaVersion := ScalaVersion,
+    crossPaths := false,
+    organizationName := "Typesafe Inc.",
+    organizationHomepage := Some(url("http://www.typesafe.com")))
 
-  private def getReleasedVersion(st: State): (String, String) = {
-    st.get(versions).getOrElse(sys.error("No versions are set."))
+  lazy val defaultSettings = buildSettings ++ Seq(
+    resolvers += "Akka Snapshots" at "http://repo.akka.io/snapshots",
+    resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots",
+    resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+    resolvers += "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots",
+    resolvers += "Typesafe Repo" at "http://repo.typesafe.com/typesafe/releases",
+    resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/public",
+    resolvers += "Twitter Repo" at "http://maven.twttr.com",
+
+      // compile options
+      scalacOptions ++= Seq ("-encoding", "UTF-8", "-deprecation", "-unchecked"),
+      javacOptions ++= Seq ("-Xlint:unchecked", "-Xlint:deprecation"))
+}
+
+object Dependencies {
+  import Dependency._
+
+  val megamAkkaKernel = Seq(
+    akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaRemote, akkaCluster, akkaLogback, sigar, zk, mg, scalaz, scalaz_effect,
+    scalaz_concurrent, lift_json, scalacheck)
+}
+
+object Dependency {
+  // Versions
+  object V {
+    val Akka = "2.2-SNAPSHOT"
+    val scalaCheckVersion = "1.10.1"
+    val scalazVersion = "7.0.0"
+    val zkVersion = "6.3.2"
+    val liftJsonVersion = "2.5-RC5"
+    val Zk = "6.3.2"
+    val Mg = "0.1.0-SNAPSHOT"
   }
 
-  private def updateReadme(st: State, newVersion: String) {
-    val newmanRegex = """\d+\.\d+\.\d+""".r
-    val oldReadme = Source.fromFile(readme).mkString
-    val out = new PrintWriter(readme, "UTF-8")
-    try {
-      val newReadme = newmanRegex.replaceAllIn(oldReadme, "%s".format(newVersion))
-      newReadme.foreach(out.write(_))
-    } finally {
-      out.close()
-    }
-  }
-
-  private def commitReadme(st: State, newVersion: String) {
-    val vcs = Project.extract(st).get(versionControlSystem).getOrElse(sys.error("Unable to get version control system."))
-    vcs.add(readme) !! st.log
-    vcs.commit("README.md updated to %s".format(newVersion)) ! st.log
-  }
+  val akkaKernel = "com.typesafe.akka" % "akka-kernel_2.10" % V.Akka
+  val akkaSlf4j = "com.typesafe.akka" % "akka-slf4j_2.10" % V.Akka
+  val akkaActor = "com.typesafe.akka" % "akka-actor_2.10" % V.Akka
+  val akkaRemote = "com.typesafe.akka" % "akka-remote_2.10" % V.Akka
+  val akkaCluster = "com.typesafe.akka" % "akka-cluster-experimental_2.10" % V.Akka
+  val akkaLogback = "ch.qos.logback" % "logback-classic" % "1.0.11"
+  val sigar = "org.fusesource" % "sigar" % "1.6.4"
+  val zk = "com.twitter" % "util-zk-common" % V.zkVersion
+  val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg
+  val scalaz = "org.scalaz" %% "scalaz-core" % V.scalazVersion
+  val scalaz_effect = "org.scalaz" %% "scalaz-effect" % V.scalazVersion
+  val scalaz_concurrent = "org.scalaz" %% "scalaz-concurrent" % V.scalazVersion
+  val lift_json = "net.liftweb" %% "lift-json-scalaz7" % V.liftJsonVersion
+  val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalaCheckVersion % "test"
 
 }
