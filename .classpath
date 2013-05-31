@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/scala-2.10/classes" path="src/main/scala"/>
+	<classpathentry kind="src" output="target/scala-2.10/classes" path="src/main/java"/>
+	<classpathentry kind="src" output="target/scala-2.10/test-classes" path="src/test/scala"/>
+	<classpathentry kind="src" output="target/scala-2.10/test-classes" path="src/test/java"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/com.typesafe.akka/akka-actor_2.10/jars/akka-actor_2.10-2.2-M2.jar"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/com.typesafe/config/bundles/config-1.0.0.jar"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/com.typesafe.akka/akka-slf4j_2.10/bundles/akka-slf4j_2.10-2.2-M2.jar"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.2.jar"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/com.typesafe.akka/akka-remote_2.10/bundles/akka-remote_2.10-2.2-M2.jar"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/io.netty/netty/bundles/netty-3.6.1.Final.jar"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/com.google.protobuf/protobuf-java/jars/protobuf-java-2.4.1.jar"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/org.uncommons.maths/uncommons-maths/jars/uncommons-maths-1.2.2a.jar"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/com.typesafe.akka/akka-cluster-experimental_2.10/bundles/akka-cluster-experimental_2.10-2.2-M2.jar"/>
+	<classpathentry kind="lib" path="/home/ram/.ivy2/cache/com.typesafe.akka/akka-testkit_2.10/bundles/akka-testkit_2.10-2.2-M2.jar"/>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
