@@ -28,8 +28,10 @@ import com.typesafe.config.Config
 class SettingsImpl(config: Config) extends Extension {
 
   val AMQPUri: String = config.getString("app.amqp.uris")
-
-  val ZkUri: String = config.getString("app.amqp.uri")
+  
+  val exchange: String = config.getString("app.amqp.exchange")
+  
+  val queue: String = config.getString("app.amqp.queue")
  
   
 }

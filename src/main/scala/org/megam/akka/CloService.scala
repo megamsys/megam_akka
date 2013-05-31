@@ -18,22 +18,21 @@ package org.megam.akka
 import scalaz._
 import Scalaz._
 import scalaz.Validation._
-
 import akka.actor._
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import java.util.concurrent.atomic.AtomicInteger
-
 import org.megam.common.amqp._
 import net.liftweb.json._
 import net.liftweb.json.scalaz.JsonScalaz._
+import org.megam.akka.extn.Settings
 
 /**
  * @author ram
  * Closervice is responsible for receiving the Clojob, and sending it to the master to execute the job.
- * During a prestart a subscribe is done to the global exchange, queue. The properites as available in the 
+ * During a prestart a subscribe is done to the global exchange, queue. The properites as available in the
  * settings file is used.
- * => Verify if this is a blocking call or non blocking. It will be non blocking. Then we need to use 
+ * => Verify if this is a blocking call or non blocking. It will be non blocking. Then we need to use
  * techniques like tick, or anything else to periodically subscribe in the queue, or Await (Blocking mode)
  * as seen here http://www.smartjava.org/content/connect-rabbitmq-amqp-using-scala-play-and-akka
  * to gather the input.
@@ -46,23 +45,39 @@ class CloService extends Actor with ActorLogging {
   case class CloFail(fail: String, job: CloJob)
 
   val cluster = Cluster(context.system)
-  
+
   // This a var. Too bad. Fix it later.
   var clomasters = IndexedSeq.empty[ActorRef]
-  
+
   val jobCounter: AtomicInteger = new AtomicInteger(0)
-  
+
+  /*val uris = "amqp://user@localhost:5672/vhost,amqp://rabbitmq@megam.co:5672/vhost"
+    val exchange_name = "megam_exchange"
+    val queue_name = "megam_queue"*/
+  val routingKey = "megam_key"
+
+  val settings = Settings(context.system)
+  val uris = settings.AMQPUri
+  val exchange_name = settings.exchange
+  val queue_name = settings.queue
+
   override def preStart(): Unit = {
-    val rmq = new RabbitMQClient("uris", "exchange", "queue")
-    rmq.subscribe(quenchThirst, "key")
+    log.info("started clo service")
+    val rmq = new RabbitMQClient(uris, exchange_name, queue_name)
+    execute(rmq.subscribe(quenchThirst, routingKey))
   }
 
   override def postStop(): Unit = {
     log.info("Stopping {} App. Not implemented yet.", "CloService")
   }
 
+  protected def execute[T](t: AMQPRequest, expectedCode: AMQPResponseCode = AMQPResponseCode.Ok) = {
+    log.info("Executing AMQPRequest")
+    val r = t.executeUnsafe
+  }
+
   /**
-   * Bunch of case classes, which knows how to handle a clojob, handle the result, 
+   * Bunch of case classes, which knows how to handle a clojob, handle the result,
    * handle result failure and process registration of masters.
    */
   def receive = {
@@ -72,10 +87,10 @@ class CloService extends Actor with ActorLogging {
 
     case job: CloJob =>
       clomasters(jobCounter.getAndIncrement() % clomasters.size) forward job
-      
+
     case result: CloRes ⇒
       println(result)
-      
+
     case failed: CloFail ⇒
       println(failed)
 
@@ -90,10 +105,11 @@ class CloService extends Actor with ActorLogging {
   /**
    * This is a callback function invoked when an consumer thirsty for a response wants it to be quenched.
    * The response is a either a success or  a failure delivered as scalaz (ValidationNel).
-   * See if a message "CloJob with the result JSON" can be sent to the sender (The sender in this case shall 
+   * See if a message "CloJob with the result JSON" can be sent to the sender (The sender in this case shall
    * be CloService"
    */
   def quenchThirst(h: AMQPResponse) = {
+    log.info("quenchThirst started")
     val result = h.toJson(true) // the response is parsed back
 
     val res: ValidationNel[Error, String] = result match {
@@ -104,6 +120,5 @@ class CloService extends Actor with ActorLogging {
     res
   }
 
-  
 }
 
