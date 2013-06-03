@@ -13,7 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 */
-package org.megam.akka.cluster.master
+package org.megam.akka.slave
 
 import akka.actor.Actor
 import akka.actor.ActorPath
@@ -37,10 +37,11 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   // We'll use the current dispatcher for the execution context.
   // You can use whatever you want.
   implicit val ec = context.dispatcher
-
+println("Slave started")
   def doWork(workSender: ActorRef, msg: Any): Unit = {
     Future {
       workSender ! msg
+      println("======WorkSender=============================>"+workSender)
       WorkComplete("done")
     } pipeTo self
   }

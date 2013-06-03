@@ -20,9 +20,8 @@ import akka.kernel.Bootable
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.cluster.MemberStatus
-
 import org.megam.akka.master.CloMaster
-
+import org.megam.akka.slave._
 /**
  * @author ram
  *
@@ -34,7 +33,7 @@ import org.megam.akka.master.CloMaster
  */
 class CloApp extends Bootable {
 
-  val system = ActorSystem("megamclo")
+  val system = ActorSystem("megamcluster")
 
   var nodes = Set.empty[Address]
 
@@ -56,7 +55,29 @@ class CloApp extends Bootable {
      *  Every cluster[clo] starts with a service and master=>workers
      */
     system.actorOf(Props[CloService], name = "closervice")
-    system.actorOf(Props[CloMaster], name = "clomaster")
+    val m = system.actorOf(Props[CloMaster], name = "clomaster")
+
+    def worker(name: String) = system.actorOf(Props(new Slave(ActorPath.fromString("akka://%s/user/%s".format(system.name, name)))))
+
+    // Create 10 workers
+    val w1 = worker("clomaster")
+    val w2 = worker("clomaster")
+    val w3 = worker("clomaster")
+    val w4 = worker("clomaster")
+    val w5 = worker("clomaster")
+    val w6 = worker("clomaster")
+    val w7 = worker("clomaster")
+    val w8 = worker("clomaster")
+    val w9 = worker("clomaster")
+    val w10 = worker("clomaster")
+
+    // Send some work to the master
+   // m ! "Hithere"
+    //m ! "Guys"
+    // m ! "So"
+    // m ! "What's"
+    //m ! "Up?"
+
   }
 
   def shutdown = {

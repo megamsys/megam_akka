@@ -21,7 +21,7 @@ import akka.actor.ActorPath
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Terminated
-
+import org.megam.akka.CloService
 import akka.actor.Props
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
@@ -33,8 +33,8 @@ import akka.cluster.MemberStatus
  */
 class CloMaster extends Actor with ActorLogging {
   import MasterWorkerProtocol._
-  import scala.collection.mutable.{Map, Queue}
-  
+  import scala.collection.mutable.{ Map, Queue }
+
   val cluster = Cluster(context.system)
 
   // Holds known workers and what they may be working on
@@ -42,32 +42,32 @@ class CloMaster extends Actor with ActorLogging {
   // Holds the incoming list of work to be done as well
   // as the memory of who asked for it
   val workQ = Queue.empty[Tuple2[ActorRef, Any]]
-  
-  
- 
+  log.info("CloMaster Started")
+
   // Notifies workers that there's work available, provided they're
   // not already working on something
   def notifyWorkers(): Unit = {
     if (!workQ.isEmpty) {
-      workers.foreach { 
+      workers.foreach {
         case (worker, m) if (m.isEmpty) => worker ! WorkIsReady
-        case _ =>
+        case _                          =>
       }
     }
   }
-  
+
   override def preStart(): Unit = {
+    log.info("CloMaster preStart Started")
     cluster.subscribe(self, classOf[MemberEvent])
     cluster.subscribe(self, classOf[UnreachableMember])
+    //cluster.subscribe(self, classOf[CloReg])
     /**
      * Send out a CloReg to closervice stating that a new master is up.
      */
   }
-  
+
   override def postStop(): Unit = {
     cluster.unsubscribe(self)
   }
-
 
   def receive = {
     // Worker is alive. Add him to the list, watch him for
@@ -120,6 +120,7 @@ class CloMaster extends Actor with ActorLogging {
       workQ.enqueue(sender -> work)
       notifyWorkers()
   }
+
 }
 
 

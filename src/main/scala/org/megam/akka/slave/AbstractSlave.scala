@@ -13,7 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 */
-package org.megam.akka.cluster.master
+package org.megam.akka.slave
 import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.ActorPath

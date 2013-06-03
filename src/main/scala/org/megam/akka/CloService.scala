@@ -26,7 +26,7 @@ import org.megam.common.amqp._
 import net.liftweb.json._
 import net.liftweb.json.scalaz.JsonScalaz._
 import org.megam.akka.extn.Settings
-
+//import org.megam.akka.CloApp
 /**
  * @author ram
  * Closervice is responsible for receiving the Clojob, and sending it to the master to execute the job.
@@ -45,7 +45,7 @@ class CloService extends Actor with ActorLogging {
   case class CloFail(fail: String, job: CloJob)
 
   val cluster = Cluster(context.system)
-
+  val system = ActorSystem("megamcluster")
   // This a var. Too bad. Fix it later.
   var clomasters = IndexedSeq.empty[ActorRef]
 
@@ -83,10 +83,11 @@ class CloService extends Actor with ActorLogging {
   def receive = {
 
     case job: CloJob if clomasters.isEmpty ⇒
-      sender ! CloFail("Service unavailable, try again later", job)
+      sender ! CloFail("Service unavailable, try again later"+clomasters.size, job)
 
-    case job: CloJob =>
-      clomasters(jobCounter.getAndIncrement() % clomasters.size) forward job
+    case job: CloJob => { 
+        println("job allocated") 
+        clomasters(jobCounter.getAndIncrement() % clomasters.size) forward job}
 
     case result: CloRes ⇒
       println(result)
@@ -97,8 +98,9 @@ class CloService extends Actor with ActorLogging {
     case CloReg if !clomasters.contains(sender) ⇒
       context watch sender
       clomasters = clomasters :+ sender
-    case Terminated(a) =>
-      clomasters = clomasters.filterNot(_ == a)
+    case Terminated(a) => { 
+      println("terminated")
+      clomasters = clomasters.filterNot(_ == a)}
 
   }
 
@@ -110,12 +112,11 @@ class CloService extends Actor with ActorLogging {
    */
   def quenchThirst(h: AMQPResponse) = {
     log.info("quenchThirst started")
-    val result = h.toJson(true) // the response is parsed back
-
+    val result = h.toJson(true) // the response is parsed back  
+    val m = self ! new CloJob(result)   
     val res: ValidationNel[Error, String] = result match {
       case respJSON => respJSON.successNel
       case _        => UncategorizedError("request type", "unsupported response type", List()).failNel
-
     }
     res
   }
