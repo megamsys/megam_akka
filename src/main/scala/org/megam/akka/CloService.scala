@@ -46,34 +46,32 @@ class CloService extends Actor with ActorLogging {
 
   val cluster = Cluster(context.system)
   val system = ActorSystem("megamcluster")
+
   // This a var. Too bad. Fix it later.
   var clomasters = IndexedSeq.empty[ActorRef]
 
   val jobCounter: AtomicInteger = new AtomicInteger(0)
 
-  /*val uris = "amqp://user@localhost:5672/vhost,amqp://rabbitmq@megam.co:5672/vhost"
-    val exchange_name = "megam_exchange"
-    val queue_name = "megam_queue"*/
-  val routingKey = "megam_key"
-
   val settings = Settings(context.system)
   val uris = settings.AMQPUri
   val exchange_name = settings.exchange
   val queue_name = settings.queue
+  val routingKey = "megam_key"
+  val findMe = "|^^^/@\"^^^|"
 
   override def preStart(): Unit = {
-    log.info("started clo service")
+    log.debug("{} Starting {}", findMe, "CloService....")
     val rmq = new RabbitMQClient(uris, exchange_name, queue_name)
     execute(rmq.subscribe(quenchThirst, routingKey))
   }
 
   override def postStop(): Unit = {
-    log.info("Stopping {} App. Not implemented yet.", "CloService")
+    log.debug("{} Stopping {} App. Not implemented yet.", findMe, "CloService....")
   }
 
   protected def execute[T](t: AMQPRequest, expectedCode: AMQPResponseCode = AMQPResponseCode.Ok) = {
-    log.info("Executing AMQPRequest")
-    val r = t.executeUnsafe
+    log.debug("{} Execute AMQP SUB {}.", findMe, "CloService....")
+     val r = t.executeUnsafe
   }
 
   /**
@@ -82,25 +80,24 @@ class CloService extends Actor with ActorLogging {
    */
   def receive = {
 
-    case job: CloJob if clomasters.isEmpty ⇒
-      sender ! CloFail("Service unavailable, try again later"+clomasters.size, job)
+    case job: CloJob if clomasters.isEmpty =>
+      sender ! CloFail("Service unavailable, try again later" + clomasters.size, job)
 
-    case job: CloJob => { 
-        println("job allocated") 
-        clomasters(jobCounter.getAndIncrement() % clomasters.size) forward job}
-
-    case result: CloRes ⇒
-      println(result)
-
-    case failed: CloFail ⇒
-      println(failed)
-
-    case CloReg if !clomasters.contains(sender) ⇒
+    case job: CloJob => {
+      log.debug("{} CloJob Forwarded.", findMe, job)
+      clomasters(jobCounter.getAndIncrement() % clomasters.size) forward job
+    }
+    case result: CloRes =>      println(result)
+    case failed: CloFail =>     log.info("{} CloFail.", findMe, failed)
+    case CloReg if !clomasters.contains(sender) => {
       context watch sender
       clomasters = clomasters :+ sender
-    case Terminated(a) => { 
-      println("terminated")
-      clomasters = clomasters.filterNot(_ == a)}
+      log.debug("{} CloReg.", findMe, clomasters.size)
+    }
+    case Terminated(a) => {
+      log.debug("{} Terminated.", findMe, clomasters.size)
+      clomasters = clomasters.filterNot(_ == a)
+    }
 
   }
 
@@ -111,11 +108,14 @@ class CloService extends Actor with ActorLogging {
    * be CloService"
    */
   def quenchThirst(h: AMQPResponse) = {
-    log.info("quenchThirst started")
+    log.info("{} Quench.", findMe, "CloService")
     val result = h.toJson(true) // the response is parsed back  
-    val m = self ! new CloJob(result)   
+    val m = self ! new CloJob(result)
     val res: ValidationNel[Error, String] = result match {
-      case respJSON => respJSON.successNel
+      case respJSON => { 
+       log.info("{} Quench.", findMe, "Successs ....")
+        respJSON.successNel
+      }
       case _        => UncategorizedError("request type", "unsupported response type", List()).failNel
     }
     res

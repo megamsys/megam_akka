@@ -51,15 +51,12 @@ class CloApp extends Bootable {
       }
     }), name = "clusterlistener")
     Cluster(system).subscribe(clusterListener, classOf[ClusterDomainEvent])
-    /**
-     *  Every cluster[clo] starts with a service and master=>workers
-     */
+    
+     //Every cluster[megamcluster] starts with a closervice and master=><x number of workers>     
     system.actorOf(Props[CloService], name = "closervice")
     val m = system.actorOf(Props[CloMaster], name = "clomaster")
 
-    def worker(name: String) = system.actorOf(Props(new Slave(ActorPath.fromString("akka://%s/user/%s".format(system.name, name)))))
-
-    // Create 10 workers
+    // Create 10 workers, use a "configurable flag" and Range over it to create the workers
     val w1 = worker("clomaster")
     val w2 = worker("clomaster")
     val w3 = worker("clomaster")
@@ -71,14 +68,10 @@ class CloApp extends Bootable {
     val w9 = worker("clomaster")
     val w10 = worker("clomaster")
 
-    // Send some work to the master
-   // m ! "Hithere"
-    //m ! "Guys"
-    // m ! "So"
-    // m ! "What's"
-    //m ! "Up?"
-
   }
+
+  def worker(name: String) = 
+    system.actorOf(Props(new Slave(ActorPath.fromString("akka://%s/user/%s".format(system.name, name)))))
 
   def shutdown = {
     system.shutdown()
