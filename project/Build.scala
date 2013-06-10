@@ -59,25 +59,26 @@ object Dependencies {
 
   val megamAkkaKernel = Seq(
     akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaRemote, akkaCluster, akkaLogback, sigar, zk, mg, scalaz, scalaz_effect,
-    scalaz_concurrent, lift_json, scalacheck)
+    scalaz_concurrent, lift_json, scalacheck, cv)
 }
 
 object Dependency {
   // Versions
   object V {
-    val Akka = "2.2-SNAPSHOT"
+    val Akka = "2.2.0-RC1"
     val scalaCheckVersion = "1.10.1"
     val scalazVersion = "7.0.0"
     val liftJsonVersion = "2.5-RC5"
     val Zk = "6.3.2"
     val Mg = "0.1.0-SNAPSHOT"
+    val Cv = "0.1.0-SNAPSHOT"
   }
 
   val akkaKernel = "com.typesafe.akka" %% "akka-kernel" % V.Akka
   val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % V.Akka
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.Akka
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
-  val akkaCluster = "com.typesafe.akka" %% "akka-cluster-experimental" % V.Akka
+  val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka
   val akkaLogback = "ch.qos.logback" % "logback-classic" % "1.0.11"
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
   val zk = "com.twitter" % "util-zk-common" % V.Zk
@@ -87,5 +88,5 @@ object Dependency {
   val scalaz_concurrent = "org.scalaz" %% "scalaz-concurrent" % V.scalazVersion
   val lift_json = "net.liftweb" %% "lift-json-scalaz7" % V.liftJsonVersion
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalaCheckVersion % "test"
-
+  val cv = "com.github.indykish" % "megam_chef" % V.Cv
 }

@@ -22,6 +22,8 @@ import akka.cluster.ClusterEvent._
 import akka.cluster.MemberStatus
 import org.megam.akka.master.CloMaster
 import org.megam.akka.slave._
+import org.megam.akka.master._
+import com.typesafe.config.ConfigFactory
 /**
  * @author ram
  *
@@ -32,11 +34,12 @@ import org.megam.akka.slave._
  * a cloresult back.
  */
 class CloApp extends Bootable {
-
+  
+  println("---------------------Clo app Started---------------------")
   val system = ActorSystem("megamcluster")
-
+ 
   var nodes = Set.empty[Address]
-
+  val servicename = "closervice"
   def startup = {
     val clusterListener = system.actorOf(Props(new Actor with ActorLogging {
       def receive = {
@@ -51,12 +54,12 @@ class CloApp extends Bootable {
       }
     }), name = "clusterlistener")
     Cluster(system).subscribe(clusterListener, classOf[ClusterDomainEvent])
-    
-     //Every cluster[megamcluster] starts with a closervice and master=><x number of workers>     
-    system.actorOf(Props[CloService], name = "closervice")
-    val m = system.actorOf(Props[CloMaster], name = "clomaster")
 
-    // Create 10 workers, use a "configurable flag" and Range over it to create the workers
+    //Every cluster[megamcluster] starts with a closervice and master=><x number of workers>     
+    system.actorOf(Props[CloService], name = "closervice")
+    system.actorOf(Props[CloMaster], name = "clomaster")
+
+     //Create 10 workers, use a "configurable flag" and Range over it to create the workers
     val w1 = worker("clomaster")
     val w2 = worker("clomaster")
     val w3 = worker("clomaster")
@@ -70,7 +73,7 @@ class CloApp extends Bootable {
 
   }
 
-  def worker(name: String) = 
+  def worker(name: String) =
     system.actorOf(Props(new Slave(ActorPath.fromString("akka://%s/user/%s".format(system.name, name)))))
 
   def shutdown = {

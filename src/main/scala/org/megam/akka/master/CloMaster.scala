@@ -15,10 +15,10 @@
 */
 package org.megam.akka.master
 
-import akka.actor.Actor
+import akka.actor.{ Actor, ActorRef, Identify, ActorIdentity }
+import akka.actor.ActorContext
 import akka.actor.ActorLogging
 import akka.actor.ActorPath
-import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Terminated
 import org.megam.akka.CloService
@@ -26,6 +26,7 @@ import akka.actor.Props
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.cluster.MemberStatus
+import org.megam.akka.CloApp
 
 /**
  * @author ram
@@ -34,15 +35,19 @@ import akka.cluster.MemberStatus
 class CloMaster extends Actor with ActorLogging {
   import MasterWorkerProtocol._
   import scala.collection.mutable.{ Map, Queue }
-
+  import org.megam.akka.CloProtocol._
+  
   val cluster = Cluster(context.system)
+  val name = "closervice"
 
   // Holds known workers and what they may be working on
   val workers = Map.empty[ActorRef, Option[Tuple2[ActorRef, Any]]]
+  
   // Holds the incoming list of work to be done as well
   // as the memory of who asked for it
   val workQ = Queue.empty[Tuple2[ActorRef, Any]]
-  log.info("CloMaster Started")
+  log.info("CloMaster Started")  
+  val identifyId = 1
 
   // Notifies workers that there's work available, provided they're
   // not already working on something
@@ -59,7 +64,16 @@ class CloMaster extends Actor with ActorLogging {
     log.info("CloMaster preStart Started")
     cluster.subscribe(self, classOf[MemberEvent])
     cluster.subscribe(self, classOf[UnreachableMember])
-    //cluster.subscribe(self, classOf[CloReg])
+
+    /*
+     * To acquire an ActorRef for an ActorSelection you need to send a message to the selection 
+     * and use the sender reference of the reply from the actor. 
+     * There is a built-in Identify message that all Actors will understand 
+     * and automatically reply to with a ActorIdentity message containing the ActorRef.
+     * 
+     */
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", name))) ! Identify(identifyId)
+
     /**
      * Send out a CloReg to closervice stating that a new master is up.
      */
@@ -70,6 +84,10 @@ class CloMaster extends Actor with ActorLogging {
   }
 
   def receive = {
+
+    case ActorIdentity(`identifyId`, Some(ref)) ⇒
+      ref ! CloReg
+
     // Worker is alive. Add him to the list, watch him for
     // death, and let him know if there's work to be done
     case WorkerCreated(worker) =>
