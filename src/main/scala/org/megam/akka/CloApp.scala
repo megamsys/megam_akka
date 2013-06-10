@@ -32,6 +32,7 @@ import org.megam.akka.slave._
  * a cloresult back.
  */
 class CloApp extends Bootable {
+  
 
   val system = ActorSystem("megamcluster")
 

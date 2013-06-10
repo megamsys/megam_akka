@@ -33,7 +33,8 @@ lazy val megamAkka = Project(
     settings = Defaults.defaultSettings ++ AkkaKernelPlugin.distSettings ++ Seq(
       libraryDependencies ++= Dependencies.megamAkkaKernel,
       distJvmOptions in Dist := "-Xms256M -Xmx1024M",
-      additionalLibs in Dist := Seq(new java.io.File("lib/libsigar-amd64-linux-1.6.4.so")),
+      additionalLibs in Dist := Seq(new java.io.File("lib/libsigar-amd64-linux-1.6.4.so"),
+          new java.io.File("lib/megam_chef-0.1.0-SNAPSHOT.jar")),
       outputDirectory in Dist := file("target/megam_akka")))
 
 
@@ -58,17 +59,16 @@ object Dependencies {
   import Dependency._
 
   val megamAkkaKernel = Seq(
-    akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaRemote, akkaCluster, akkaLogback, sigar, zk, mg, scalaz, scalaz_effect,
-    scalaz_concurrent, lift_json, scalacheck)
+    akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaRemote, akkaCluster, akkaLogback, sigar, zk, mg, scalaz, scalaz_effect, scalaz_concurrent, lift_json, scalacheck)
 }
 
 object Dependency {
   // Versions
   object V {
-    val Akka = "2.2-SNAPSHOT"
+    val Akka = "2.2.0-RC1"
     val scalaCheckVersion = "1.10.1"
     val scalazVersion = "7.0.0"
-    val liftJsonVersion = "2.5-RC5"
+    val liftJsonVersion = "2.5"
     val Zk = "6.3.2"
     val Mg = "0.1.0-SNAPSHOT"
   }
@@ -77,7 +77,7 @@ object Dependency {
   val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % V.Akka
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.Akka
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
-  val akkaCluster = "com.typesafe.akka" %% "akka-cluster-experimental" % V.Akka
+  val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka
   val akkaLogback = "ch.qos.logback" % "logback-classic" % "1.0.11"
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
   val zk = "com.twitter" % "util-zk-common" % V.Zk
