@@ -15,33 +15,61 @@
 */
 package org.megam.akka.slave
 
+import scalaz._
+import Scalaz._
 import akka.actor.Actor
 import akka.actor.ActorPath
 import akka.actor.ActorRef
 import akka.pattern.pipe
 import scala.concurrent.Future
-
+import org.megam.akka.CloProtocol._
+import net.liftweb.json._
+import org.megam.chef.ChefServiceRunner
+import org.megam.chef.DropIn
+import org.megam.chef.ProvisionerFactory.TYPE
+import org.megam.chef.exception.BootStrapChefException
+import org.megam.chef.exception.ProvisionerException
+import org.megam.chef.exception.SourceException
 /**
  * @author ram
  *
- * Any retry-logic that you might want would have to live in the InstrumenteeMaster, 
- * but should we support idempotency (or) retry from stale state ?. 
- * 
- * Implement retry in InstrumenteeMaster and / or dovetail this concept into the 
- * Clustering features of akka. 
- * 
- * Implement doWork() in the future, that the Worker is responsive to the InstrumenteeMaster’s 
+ * Any retry-logic that you might want would have to live in the InstrumenteeMaster,
+ * but should we support idempotency (or) retry from stale state ?.
+ *
+ * Implement retry in InstrumenteeMaster and / or dovetail this concept into the
+ * Clustering features of akka.
+ *
+ * Implement doWork() in the future, that the Worker is responsive to the InstrumenteeMaster’s
  * requests for status (or) streaming log updates to redis....
  */
+case class MessageJson(code: Int, body: String, time_received: String)
+case class BodyJson(message: String)
+
 class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   // We'll use the current dispatcher for the execution context.
   // You can use whatever you want.
   implicit val ec = context.dispatcher
-println("Slave started")
+  implicit val formats = DefaultFormats
+  println("Slave started")
+ 
+  def jsonValue(msg: Any): String = {
+    msg match {
+      case CloJob(x) => {
+        val json = parse(x)
+        val m = json.extract[MessageJson]
+        val n = (parse(m.body)).extract[BodyJson]
+        val mm = n.message
+        mm
+      }
+      case None => ""
+    }
+  }
+  
   def doWork(workSender: ActorRef, msg: Any): Unit = {
     Future {
       workSender ! msg
-      println("======WorkSender=============================>"+workSender)
+      val id = jsonValue(msg)     
+      val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
       WorkComplete("done")
     } pipeTo self
   }

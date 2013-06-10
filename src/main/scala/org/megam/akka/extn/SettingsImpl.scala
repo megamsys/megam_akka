@@ -34,6 +34,7 @@ class SettingsImpl(config: Config) extends Extension {
   val queue: String = config.getString("app.amqp.queue")
  
   
+  
 }
 
 object Settings extends ExtensionId[SettingsImpl] with ExtensionIdProvider {
