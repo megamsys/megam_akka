@@ -34,13 +34,13 @@ lazy val megamAkka = Project(
       libraryDependencies ++= Dependencies.megamAkkaKernel,
       distJvmOptions in Dist := "-Xms256M -Xmx1024M",
       additionalLibs in Dist := Seq(new java.io.File("lib/libsigar-amd64-linux-1.6.4.so")),
-      outputDirectory in Dist := file("target/megam_akka")))
+      outputDirectory in Dist := file("target/megam_akka")))   
 
 
   lazy val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := Organization,
     version := Version,
-    scalaVersion := ScalaVersion,
+    scalaVersion := ScalaVersion,   
     crossPaths := false,
     organizationName := "Megam Systems.",
     organizationHomepage := Some(url("http://www.megam.co")))
@@ -50,7 +50,8 @@ lazy val megamAkka = Project(
   lazy val defaultSettings = buildSettings ++ Seq(
       // compile options
       scalacOptions ++= Seq ("-encoding", "UTF-8", "-deprecation", "-unchecked"),
-      javacOptions ++= Seq ("-Xlint:unchecked", "-Xlint:deprecation"))
+      javacOptions ++= Seq ("-Xlint:unchecked", "-Xlint:deprecation"))       
+  
 
 }
 

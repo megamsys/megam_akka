@@ -9,3 +9,6 @@ addSbtPlugin("com.typesafe.akka" % "akka-sbt-plugin" % "2.2-M3")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.2.0")
 
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.5.4")
+
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.7")
