@@ -7,16 +7,17 @@ import sbtrelease._
 import ReleasePlugin._
 import ReleaseKeys._
 import org.scalastyle.sbt.ScalastylePlugin
+import S3._
 
 seq(packagerSettings:_*)
 
-maintainer in Debian:= "Rajthilak <rajthilak@rajthilak>"
+maintainer in Debian:= "Rajthilak <rajthilak@megam.co.in>"
 
 packageSummary := "Cloud instrumentation agents."
 
 packageDescription in Debian:= "Cloud instrumentation allows the lifecycle of cloud infrastructure provisioning to be managed, ease repeatable deployments, change the behaviour of instances by injecting behaviour. "
 
-com.typesafe.sbt.packager.debian.Keys.name in Debian := "megamakka"
+com.typesafe.sbt.packager.debian.Keys.name in Debian := "megam_akka"
 
 ScalastylePlugin.Settings
 
@@ -39,10 +40,6 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
    withUser "root" withGroup "root" withPerms "0755")
 }
 
-linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
-  (packageMapping((bd / "target/megam_akka/bin/start.bat") -> "/usr/local/share/megamakka/bin/start.bat")
-   withUser "root" withGroup "root" withPerms "0755")
-}
 
 linuxPackageMappings <+= (baseDirectory) map { bd =>
   val src = bd / "target/megam_akka/lib"
@@ -79,10 +76,22 @@ com.typesafe.sbt.packager.debian.Keys.version in Debian <<= (com.typesafe.sbt.pa
 
 debianPackageDependencies in Debian ++= Seq("curl", "java2-runtime", "bash (>= 2.05a-11)")
 
-debianPackageRecommends in Debian += "git"
+debianPackageRecommends in Debian += "rabbitmq-server"
+
+linuxPackageMappings <+= (baseDirectory) map { bd =>
+  packageMapping(
+    (bd / "copyright") -> "/usr/share/doc/megam_akka/copyright"
+  ) withPerms "0644" asDocs()
+}
 
 linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.sourceDirectory) map { bd =>
   (packageMapping(
-    (bd / "debian/changelog") -> "/usr/share/doc/megam_akka/changelog.gz"
+    (bd / "CHANGELOG") -> "/usr/share/doc/megam_akka/changelog.gz"
   ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
 }
+
+mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megam_akka", "0.12.3-build-0100")),"debs/megam_akka0.1.0.deb"))
+
+host in upload := "megampub.s3.amazonaws.com"
+
+credentials += Credentials(Path.userHome / "software" / "aws" / "keys" / "sbt_s3_keys")
