@@ -50,7 +50,7 @@ class CloService extends Actor with ActorLogging {
 
   val jobCounter: AtomicInteger = new AtomicInteger(0)
   log.info("==================================CloService Started========================================")
-  val settings = Settings(context.system)
+  val settings = Settings(context.system) 
   val uris = settings.AMQPUri
   val exchange_name = settings.exchange
   val queue_name = settings.queue

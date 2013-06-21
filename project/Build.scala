@@ -59,7 +59,7 @@ object Dependencies {
   import Dependency._
 
   val megamAkkaKernel = Seq(
-    akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaRemote, akkaCluster, akkaLogback, sigar, zk, mg, scalaz, scalaz_effect,
+    akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaRemote, akkaCluster, akkalog4j, sigar, zk, mg, scalaz, scalaz_effect,
     scalaz_concurrent, lift_json, scalacheck, cv)
 }
 
@@ -80,7 +80,7 @@ object Dependency {
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.Akka
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
   val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka
-  val akkaLogback = "ch.qos.logback" % "logback-classic" % "1.0.11"
+  val akkalog4j = "log4j" % "log4j" % "1.2.17"
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
   val zk = "com.twitter" % "util-zk-common" % V.Zk
   val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg
