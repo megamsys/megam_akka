@@ -33,11 +33,9 @@ import com.typesafe.config.ConfigFactory
  * helps us to instrument the nodes. 
  * 
  */
-class GulpApp extends Bootable {
+class GulpApp extends Bootable {  
   
-  val conf = ConfigFactory.load()
-  val gulpsystem = ActorSystem("megamgulp", conf.getConfig("akka-gulp"))
-  println(""+conf.getConfig("akka-gulp"))
+  val gulpsystem = ActorSystem("megamgulp")
   def startup = {
     val clusterListener = gulpsystem.actorOf(Props(new Actor with ActorLogging {
       def receive = {

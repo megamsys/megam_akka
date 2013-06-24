@@ -33,6 +33,8 @@ import net.liftweb.json._
 import net.liftweb.json.scalaz.JsonScalaz._
 import org.megam.akka.extn.Settings
 import scala.io.Source
+import java.io.File
+
 /**
  * @author ram
  *
@@ -42,17 +44,15 @@ class GulpActor extends Actor with ActorLogging {
 
   import org.megam.akka.gulps.GulpProtocol._
   implicit val formats = DefaultFormats
-  
+
   val cluster = Cluster(context.system)
   var masters = IndexedSeq.empty[ActorRef]
   var jobCounter = 0
-  
+
   println("====================Gulp Actor Started====================")
 
   val settings = Settings(context.system)
-  val lines = Source.fromFile("/home/rajthilak/.megam/redis.json")
-  val data = parse(lines mkString).extract[Queue_info]
-  println("+++++++++++++++++++++++++++++++++++++++++" + data)
+  val str1 = new java.io.File("/home/rajthilak/.megam/").listFiles.filter(_.getName.endsWith(".json"))
   val uris = settings.AMQPUri
   val exchange_name = settings.exchange
   val queue_name = settings.queue
@@ -61,8 +61,12 @@ class GulpActor extends Actor with ActorLogging {
 
   override def preStart(): Unit = {
     log.debug("{} Starting {}", findMe, "GulpService....")
-    val rmq = new RabbitMQClient(uris, exchange_name, queue_name)
-    execute(rmq.subscribe(quenchThirst, routingKey))
+    str1.map(a => {
+      val lines = Source.fromFile(a)
+      val data = parse(lines mkString).extract[Queue_info]
+      val rmq = new RabbitMQClient(uris, data.exchange, data.queue)
+      execute(rmq.subscribe(quenchThirst, routingKey))
+    })
   }
 
   override def postStop(): Unit = {
@@ -81,7 +85,7 @@ class GulpActor extends Actor with ActorLogging {
     }
     case job: GulpJob => {
       jobCounter += 1
-      println("master size---->" + job)
+      log.debug("master size---->" + job)
       masters(jobCounter % masters.size) forward job
     }
     case MasterRegistration if !masters.contains(sender) => {

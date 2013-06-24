@@ -36,7 +36,8 @@ class GulpSlave (masterLocation: ActorPath) extends AbstractSlave(masterLocation
   
   def doWork(workSender: ActorRef, msg: Any): Unit = {
     Future {
-      workSender ! msg      
+      workSender ! msg   
+      println("----------"+msg)
       WorkComplete("done")
     } pipeTo self
   }
