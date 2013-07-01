@@ -20,7 +20,7 @@ com.typesafe.sbt.packager.debian.Keys.name in Debian := "megamakka"
 
 ScalastylePlugin.Settings
 
-scalaVersion := "2.10.1"
+scalaVersion := "2.10.2"
 
 resolvers += "akka" at "http://repo.akka.io/snapshots"
 

@@ -33,23 +33,23 @@ import org.megam.akka.CloApp
  *
  */
 class CloMaster extends Actor with ActorLogging {
-  
+
   import MasterWorkerProtocol._
   import scala.collection.mutable.{ Map, Queue }
   import org.megam.akka.CloProtocol._
-  
-  val cluster = Cluster(context.system)
-  val name = "closervice"
 
+  val cluster = Cluster(context.system)
+  val cloName = "closervice"
+  val nodeName = "nodeactor"
   // Holds known workers and what they may be working on
   val workers = Map.empty[ActorRef, Option[Tuple2[ActorRef, Any]]]
-  
+
   // Holds the incoming list of work to be done as well
   // as the memory of who asked for it
   val workQ = Queue.empty[Tuple2[ActorRef, Any]]
-  log.info("CloMaster Started")  
-  val identifyId = 1
-
+  log.info("CloMaster Started")
+  val cloIdentifyId = 1
+  val nodeIdentifyId = 2
   // Notifies workers that there's work available, provided they're
   // not already working on something
   def notifyWorkers(): Unit = {
@@ -73,8 +73,8 @@ class CloMaster extends Actor with ActorLogging {
      * and automatically reply to with a ActorIdentity message containing the ActorRef.
      * 
      */
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", name))) ! Identify(identifyId)
-
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", cloName))) ! Identify(cloIdentifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", nodeName))) ! Identify(nodeIdentifyId)
     /**
      * Send out a CloReg to closervice stating that a new master is up.
      */
@@ -86,9 +86,11 @@ class CloMaster extends Actor with ActorLogging {
 
   def receive = {
 
-    case ActorIdentity(`identifyId`, Some(ref)) ⇒
+    case ActorIdentity(`cloIdentifyId`, Some(ref)) ⇒
       ref ! CloReg
 
+    case ActorIdentity(`nodeIdentifyId`, Some(ref)) ⇒
+      ref ! NodeReg
     // Worker is alive. Add him to the list, watch him for
     // death, and let him know if there's work to be done
     case WorkerCreated(worker) =>
@@ -136,6 +138,7 @@ class CloMaster extends Actor with ActorLogging {
     // Anything other than our own protocol is "work to be done"
     case work =>
       log.info("Queueing {}", work)
+      println("=="+sender+"===="+work)
       workQ.enqueue(sender -> work)
       notifyWorkers()
   }

@@ -25,7 +25,7 @@ object MegamAkkaKernel extends Build {
 
    val Organization = "org.megam"
   val Version      = "2.2-SNAPSHOT"
-  val ScalaVersion = "2.10.1"
+  val ScalaVersion = "2.10.2"
 
 lazy val megamAkka = Project(
     id = "megam_akka",
@@ -59,8 +59,8 @@ object Dependencies {
   import Dependency._
 
   val megamAkkaKernel = Seq(
-    akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaRemote, akkaCluster, akkalog4j, sigar, zk, mg, scalaz, scalaz_effect,
-    scalaz_concurrent, lift_json, scalacheck, cv)
+    akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaRemote, akkaCluster, sigar, zk_common, mg, scalaz, scalaz_effect,
+    scalaz_concurrent, lift_json, scalacheck, cv, util_log, util_core, zk)
 }
 
 object Dependency {
@@ -70,7 +70,7 @@ object Dependency {
     val scalaCheckVersion = "1.10.1"
     val scalazVersion = "7.0.0"
     val liftJsonVersion = "2.5-RC5"
-    val Zk = "6.3.2"
+    val Zk = "6.3.6"
     val Mg = "0.1.0-SNAPSHOT"
     val Cv = "0.1.0-SNAPSHOT"
   }
@@ -79,10 +79,9 @@ object Dependency {
   val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % V.Akka
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.Akka
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
-  val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka
-  val akkalog4j = "log4j" % "log4j" % "1.2.17"
+  val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka 
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
-  val zk = "com.twitter" % "util-zk-common" % V.Zk
+  val zk_common = "com.twitter" % "util-zk-common_2.10" % V.Zk
   val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg
   val scalaz = "org.scalaz" %% "scalaz-core" % V.scalazVersion
   val scalaz_effect = "org.scalaz" %% "scalaz-effect" % V.scalazVersion
@@ -90,4 +89,7 @@ object Dependency {
   val lift_json = "net.liftweb" %% "lift-json-scalaz7" % V.liftJsonVersion
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalaCheckVersion % "test"
   val cv = "com.github.indykish" % "megam_chef" % V.Cv
+  val util_log = "com.twitter" % "util-logging_2.10" % "6.3.6"
+  val util_core = "com.twitter" % "util-core_2.10" % "6.3.6"
+  val zk = "com.twitter" % "util-zk_2.10" % V.Zk
 }

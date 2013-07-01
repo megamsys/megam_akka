@@ -22,22 +22,22 @@ import akka.actor.ActorPath
 import akka.actor.ActorRef
 import akka.pattern.pipe
 import scala.concurrent.Future
+
 /**
  * @author rajthilak
  *
  */
-class GulpSlave (masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
+class GulpSlave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   // We'll use the current dispatcher for the execution context.
   // You can use whatever you want.
   implicit val ec = context.dispatcher
- 
-  println("Gulp Slave started")  
- 
-  
+
+  println("Gulp Slave started")
+
   def doWork(workSender: ActorRef, msg: Any): Unit = {
     Future {
-      workSender ! msg   
-      println("----------"+msg)
+      workSender ! msg
+      println("----------" + msg)     
       WorkComplete("done")
     } pipeTo self
   }

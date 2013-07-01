@@ -26,4 +26,8 @@ object CloProtocol {
   case class CloRes(res: String)
   case class CloFail(fail: String, job: CloJob)
   
+  case object NodeReg
+  case class NodeJob(job: String)
+  case class NodeRes(res: String)
+  case class NodeFail(fail: String, job: NodeJob)
 }

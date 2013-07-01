@@ -58,6 +58,7 @@ class CloApp extends Bootable {
 
     //Every cluster[megamcluster] starts with a closervice and master=><x number of workers>     
     system.actorOf(Props[CloService], name = "closervice")
+    system.actorOf(Props[NodeInstanceActor], name = "nodeactor")
     system.actorOf(Props[CloMaster], name = "clomaster")
 
      //Create 10 workers, use a "configurable flag" and Range over it to create the workers

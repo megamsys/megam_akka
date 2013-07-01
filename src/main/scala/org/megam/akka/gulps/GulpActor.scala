@@ -34,7 +34,9 @@ import net.liftweb.json.scalaz.JsonScalaz._
 import org.megam.akka.extn.Settings
 import scala.io.Source
 import java.io.File
-
+import org.megam.common._
+import com.twitter.zk._
+import com.twitter.logging.Logger
 /**
  * @author ram
  *
@@ -64,7 +66,7 @@ class GulpActor extends Actor with ActorLogging {
     str1.map(a => {
       val lines = Source.fromFile(a)
       val data = parse(lines mkString).extract[Queue_info]
-      val rmq = new RabbitMQClient(uris, data.exchange, data.queue)
+      val rmq = new RabbitMQClient(uris, data.exchange, data.queue)       
       execute(rmq.subscribe(quenchThirst, routingKey))
     })
   }
