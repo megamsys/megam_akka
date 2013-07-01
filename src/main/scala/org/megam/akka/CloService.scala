@@ -1,5 +1,5 @@
 /* 
-** Copyright [2012-2013] [Megam Systems]
+# ** Copyright [2012-2013] [Megam Systems]
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -40,8 +40,7 @@ import org.megam.akka.extn.Settings
  */
 
 class CloService extends Actor with ActorLogging {
-   import org.megam.akka.CloProtocol._
-  
+  import org.megam.akka.CloProtocol._
 
   val cluster = Cluster(context.system)
 
@@ -81,8 +80,8 @@ class CloService extends Actor with ActorLogging {
     case job: CloJob if clomasters.isEmpty =>
       sender ! CloFail("Service unavailable, try again later" + clomasters.size, job)
 
-    case job: CloJob => {      
-      log.debug("{} CloJob Forwarded.{}", findMe, job)
+    case job: CloJob => {
+      log.debug("{} CloJob Forwarded.{}", findMe, job)     
       clomasters(jobCounter.getAndIncrement() % clomasters.size) forward job
     }
     case result: CloRes  => println(result)
@@ -92,7 +91,7 @@ class CloService extends Actor with ActorLogging {
       clomasters = clomasters :+ sender
       log.info("=========CloReg created============")
       log.debug("{} CloReg.{}", findMe, clomasters.size)
-    } 
+    }
     case Terminated(a) => {
       log.debug("{} Terminated.{}", findMe, clomasters.size)
       clomasters = clomasters.filterNot(_ == a)
@@ -109,9 +108,9 @@ class CloService extends Actor with ActorLogging {
   def quenchThirst(h: AMQPResponse) = {
     log.info("{} Quench.{}", findMe, "CloService")
     val result = h.toJson(false) // the response is parsed back       
-    self ! new CloJob(result)    
+    self ! new CloJob(result)
     val res: ValidationNel[Error, String] = result match {
-      case respJSON => {       
+      case respJSON => {
         log.info("{} Quench.{}", findMe, "Successs ....")
         respJSON.successNel
       }

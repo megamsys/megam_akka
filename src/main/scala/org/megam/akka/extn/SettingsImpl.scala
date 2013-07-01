@@ -33,6 +33,7 @@ class SettingsImpl(config: Config) extends Extension {
   
   val queue: String = config.getString("app.amqp.queue")
  
+  val ZooUri: String = config.getString("app.zoo.uris")
   
   
 }

@@ -33,7 +33,7 @@ object Config {
   val AMQP_URIS = ConfigFactory.load().getString("amqp.host")
   val AMQP_MAIN_QUEUE = ConfigFactory.load().getString("amqp.global.queue")
   val AMQP_MAIN_EXCHANGEE = ConfigFactory.load().getString("amqp.global.exchange")
-  
+  val ZOO_URIS = ConfigFactory.load().getString("amqp.host")
   /**
    * Load the zk settings
    */

@@ -1,5 +1,5 @@
 /* 
-** Copyright [2012-2013] [Megam Systems]
+** Copyright [2012] [Megam Systems]
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 */
-package org.megam.akka.master
+package org.megam.akka.gulps
 
 import akka.actor.{ Actor, ActorRef, Identify, ActorIdentity }
 import akka.actor.ActorContext
@@ -21,35 +21,33 @@ import akka.actor.ActorLogging
 import akka.actor.ActorPath
 import akka.actor.ActorSystem
 import akka.actor.Terminated
-import org.megam.akka.CloService
 import akka.actor.Props
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.cluster.MemberStatus
-import org.megam.akka.CloApp
-
+import org.megam.akka.GulpApp
 /**
- * @author ram
+ * @author rajthilak
  *
  */
-class CloMaster extends Actor with ActorLogging {
-
-  import MasterWorkerProtocol._
+class GulpMaster extends Actor with ActorLogging {
+  
+  import org.megam.akka.master.MasterWorkerProtocol._
   import scala.collection.mutable.{ Map, Queue }
-  import org.megam.akka.CloProtocol._
-
+  import org.megam.akka.gulps.GulpProtocol._
+  
   val cluster = Cluster(context.system)
-  val cloName = "closervice"
-  val nodeName = "nodeactor"
+  val name = "gulpactor"
+
   // Holds known workers and what they may be working on
   val workers = Map.empty[ActorRef, Option[Tuple2[ActorRef, Any]]]
-
+  
   // Holds the incoming list of work to be done as well
   // as the memory of who asked for it
   val workQ = Queue.empty[Tuple2[ActorRef, Any]]
-  log.info("CloMaster Started")
-  val cloIdentifyId = 1
-  val nodeIdentifyId = 2
+  log.info("GulpMaster Started")  
+  val identifyId = 1
+
   // Notifies workers that there's work available, provided they're
   // not already working on something
   def notifyWorkers(): Unit = {
@@ -62,7 +60,7 @@ class CloMaster extends Actor with ActorLogging {
   }
 
   override def preStart(): Unit = {
-    log.info("CloMaster preStart Started")
+    log.info("GulpMaster preStart Started")
     cluster.subscribe(self, classOf[MemberEvent])
     cluster.subscribe(self, classOf[UnreachableMember])
 
@@ -73,8 +71,8 @@ class CloMaster extends Actor with ActorLogging {
      * and automatically reply to with a ActorIdentity message containing the ActorRef.
      * 
      */
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", cloName))) ! Identify(cloIdentifyId)
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", nodeName))) ! Identify(nodeIdentifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamgulp", name))) ! Identify(identifyId)
+
     /**
      * Send out a CloReg to closervice stating that a new master is up.
      */
@@ -86,11 +84,9 @@ class CloMaster extends Actor with ActorLogging {
 
   def receive = {
 
-    case ActorIdentity(`cloIdentifyId`, Some(ref)) ⇒
-      ref ! CloReg
+    case ActorIdentity(`identifyId`, Some(ref)) ⇒
+      ref ! MasterRegistration
 
-    case ActorIdentity(`nodeIdentifyId`, Some(ref)) ⇒
-      ref ! NodeReg
     // Worker is alive. Add him to the list, watch him for
     // death, and let him know if there's work to be done
     case WorkerCreated(worker) =>
@@ -138,40 +134,8 @@ class CloMaster extends Actor with ActorLogging {
     // Anything other than our own protocol is "work to be done"
     case work =>
       log.info("Queueing {}", work)
-      println("=="+sender+"===="+work)
       workQ.enqueue(sender -> work)
       notifyWorkers()
   }
-
-}
-
-
-/*
-
-
-  def worker(name: String) = system.actorOf(Props(
-    new Slave(ActorPath.fromString(
-      "akka://%s/user/%s".format(system.name, name)))))
-
   
-      val m = system.actorOf(Props[Master], "clomaster")
-      // Create 10 workers
-      val w1 = worker("clomaster")
-      val w2 = worker("clomaster")
-      val w3 = worker("clomaster")
-      val w4 = worker("clomaster")
-      val w5 = worker("clomaster")
-      val w6 = worker("clomaster")
-      val w7 worker("clomaster")
-      val w8 = worker("clomaster")
-      val w9 = worker("clomaster")
-      val w10 = worker("clomaster")
-     
-      // Send some work to the master
-      m ! "Hithere"
-      m ! "Guys"
-      m ! "So"
-      m ! "What's"
-      m ! "Up?"
-   
-*/
+}

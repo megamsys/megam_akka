@@ -72,7 +72,7 @@ abstract class AbstractSlave(masterLocation: ActorPath)
       master ! WorkerRequestsWork(self)
     // Send the work off to the implementation
     case WorkToBeDone(work) =>
-      log.info("Got work {}", work)
+      log.info("Got work {}", work)      
       doWork(sender, work)
       context.become(working(work))
     // We asked for it, but either someone else got it first, or

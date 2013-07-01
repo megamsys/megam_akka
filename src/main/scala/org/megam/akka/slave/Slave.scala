@@ -30,6 +30,12 @@ import org.megam.chef.ProvisionerFactory.TYPE
 import org.megam.chef.exception.BootStrapChefException
 import org.megam.chef.exception.ProvisionerException
 import org.megam.chef.exception.SourceException
+import org.megam.akka.extn.Settings
+import org.megam.common._
+import com.twitter.zk._
+import com.twitter.util.{ Duration, Promise, TimeoutException, Timer, Return, Await }
+import org.apache.zookeeper.data.{ ACL, Stat }
+import org.apache.zookeeper.KeeperException
 /**
  * @author ram
  *
@@ -51,7 +57,9 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   implicit val ec = context.dispatcher
   implicit val formats = DefaultFormats
   println("Slave started")
- 
+  val settings = Settings(context.system)
+  val uris = settings.ZooUri
+  val nodeName = "nodeactor"
   def jsonValue(msg: Any): String = {
     msg match {
       case CloJob(x) => {
@@ -61,15 +69,30 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         val mm = n.message
         mm
       }
+      case NodeJob(x) => {
+        val json = parse(x)      
+        val m = json.extract[MessageJson]
+        m.body
+      }
       case None => ""
     }
   }
-  
+
   def doWork(workSender: ActorRef, msg: Any): Unit = {
     Future {
-      workSender ! msg
-      val id = jsonValue(msg)     
-      val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
+      workSender ! msg     
+      msg match {
+        case CloJob(x) => {          
+           val id = jsonValue(msg)
+          context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", "nodeactor"))) ! new NodeJob(id)
+          val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
+          
+        }
+        case NodeJob(x) => {        
+          val zoo = new Zoo(uris, "nodes")
+          zoo.create(x, "Request ID started")
+        }
+      }
       WorkComplete("done")
     } pipeTo self
   }

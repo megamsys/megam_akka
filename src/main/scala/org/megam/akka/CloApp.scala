@@ -36,8 +36,13 @@ import com.typesafe.config.ConfigFactory
 class CloApp extends Bootable {
 
   println("---------------------Clo app Started---------------------")
+  //val conf = ConfigFactory.load()
   val system = ActorSystem("megamcluster")
+<<<<<<< HEAD
 
+=======
+// println(""+conf.getConfig("akka"))
+>>>>>>> rt/master
   var nodes = Set.empty[Address]
   val servicename = "closervice"
   def startup = {
@@ -57,6 +62,7 @@ class CloApp extends Bootable {
 
     //Every cluster[megamcluster] starts with a closervice and master=><x number of workers>     
     system.actorOf(Props[CloService], name = "closervice")
+    system.actorOf(Props[NodeInstanceActor], name = "nodeactor")
     system.actorOf(Props[CloMaster], name = "clomaster")
 
     //Create 10 workers, use a "configurable flag" and Range over it to create the workers
