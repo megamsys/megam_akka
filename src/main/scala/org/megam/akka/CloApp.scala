@@ -36,13 +36,8 @@ import com.typesafe.config.ConfigFactory
 class CloApp extends Bootable {
 
   println("---------------------Clo app Started---------------------")
-  //val conf = ConfigFactory.load()
   val system = ActorSystem("megamcluster")
-<<<<<<< HEAD
 
-=======
-// println(""+conf.getConfig("akka"))
->>>>>>> rt/master
   var nodes = Set.empty[Address]
   val servicename = "closervice"
   def startup = {

@@ -60,7 +60,7 @@ object Dependencies {
 
   val megamAkkaKernel = Seq(
     akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaCluster, sigar, zk_common, mg, mc, scalaz, scalaz_effect,
-    scalaz_concurrent, lift_json, scalacheck, cv, util_log, util_core, zk)
+    scalaz_concurrent, lift_json, scalacheck, util_log, util_core, zk)
 }
 
 object Dependency {
@@ -88,7 +88,6 @@ object Dependency {
   val scalaz_concurrent = "org.scalaz" %% "scalaz-concurrent" % V.scalazVersion
   val lift_json = "net.liftweb" %% "lift-json-scalaz7" % V.liftJsonVersion
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalaCheckVersion % "test"
-  val cv = "com.github.indykish" % "megam_chef" % V.Cv
   val util_log = "com.twitter" % "util-logging_2.10" % "6.3.6"
   val util_core = "com.twitter" % "util-core_2.10" % "6.3.6"
   val zk = "com.twitter" % "util-zk_2.10" % V.Zk
