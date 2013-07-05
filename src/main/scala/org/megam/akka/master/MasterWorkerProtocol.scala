@@ -22,7 +22,7 @@ import akka.actor.ActorRef
  *
  */
 object MasterWorkerProtocol {
-  
+
   // Messages from Workers
   case class WorkerCreated(worker: ActorRef)
   case class WorkerRequestsWork(worker: ActorRef)
@@ -32,5 +32,15 @@ object MasterWorkerProtocol {
   case class WorkToBeDone(work: Any)
   case object WorkIsReady
   case object NoWorkToBeDone
+
+  case object NodeReg
+  case class NodeJob(job: String)
+  case class NodeRes(res: String)
+  case class NodeFail(fail: String, job: NodeJob)
+
+  case object WatchReg
+  case class WatchJob(job: String)
+  case class WatchRes(res: String)
+  case class WatchFail(fail: String, job: WatchJob)
 
 }

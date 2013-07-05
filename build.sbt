@@ -7,6 +7,7 @@ import sbtrelease._
 import ReleasePlugin._
 import ReleaseKeys._
 import org.scalastyle.sbt.ScalastylePlugin
+import S3._
 
 seq(packagerSettings:_*)
 
@@ -19,6 +20,8 @@ packageDescription in Debian:= "Cloud instrumentation allows the lifecycle of cl
 com.typesafe.sbt.packager.debian.Keys.name in Debian := "megamakka"
 
 ScalastylePlugin.Settings
+
+s3Settings
 
 scalaVersion := "2.10.2"
 
@@ -86,3 +89,17 @@ linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.source
     (bd / "debian/changelog") -> "/usr/share/doc/megam_akka/changelog.gz"
   ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
 }
+
+mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamakka", "0.12.4-build-0100")),"debs/megam_akka0.1.0.deb"))
+
+host in upload := "megampub.s3.amazonaws.com"
+
+mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamakka", "0.12.4-build-0100")),"debs/megam_akka0.1.0.deb"))
+
+host in download := "megampub.s3.amazonaws.com"
+
+mappings in delete := Seq("debs/megam_akka0.1.0.deb")
+
+host in delete := "megampub.s3.amazonaws.com"
+
+credentials += Credentials(Path.userHome / "software" / "aws" / "keys" / "sbt_s3_keys")

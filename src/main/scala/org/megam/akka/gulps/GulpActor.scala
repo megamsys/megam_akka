@@ -42,14 +42,20 @@ import com.twitter.logging.Logger
  *
  */
 case class Queue_info(name: String, exchange: String, queue: String)
+
 class GulpActor extends Actor with ActorLogging {
 
   import org.megam.akka.gulps.GulpProtocol._
+  
   implicit val formats = DefaultFormats
 
   val cluster = Cluster(context.system)
+  
+   // This a var. Too bad. Fix it later.
   var masters = IndexedSeq.empty[ActorRef]
-  var jobCounter = 0
+  
+  //var jobCounter = 0
+  val jobCounter: AtomicInteger = new AtomicInteger(0)
 
   println("====================Gulp Actor Started====================")
 
@@ -85,10 +91,10 @@ class GulpActor extends Actor with ActorLogging {
       println("Service unavailable, try again later----" + job)
       sender ! JobFailed("Service unavailable, try again later", job)
     }
-    case job: GulpJob => {
-      jobCounter += 1
+    case job: GulpJob => {     
       log.debug("master size---->" + job)
-      masters(jobCounter % masters.size) forward job
+      //masters(jobCounter % masters.size) forward job
+      masters(jobCounter.getAndIncrement() % masters.size) forward job
     }
     case MasterRegistration if !masters.contains(sender) => {
       context watch sender

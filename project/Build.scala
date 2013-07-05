@@ -66,7 +66,7 @@ object Dependencies {
 object Dependency {
   // Versions
   object V {
-    val Akka = "2.2.0-RC1"
+    val Akka = "2.2.0-RC2"
     val scalaCheckVersion = "1.10.1"
     val scalazVersion = "7.0.0"
     val liftJsonVersion = "2.5-RC5"
