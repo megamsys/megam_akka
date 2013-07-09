@@ -101,8 +101,8 @@ mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megam
 
 host in download := "megampub.s3.amazonaws.com"
 
-mappings in delete := Seq("debs/megam_akka0.1.0.deb")
+//mappings in delete := Seq("debs/megam_akka0.1.0.deb")
 
-host in delete := "megampub.s3.amazonaws.com"
+//host in delete := "megampub.s3.amazonaws.com"
 
 credentials += Credentials(Path.userHome / "software" / "aws" / "keys" / "sbt_s3_keys")
