@@ -26,28 +26,30 @@ import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.cluster.MemberStatus
 import org.megam.akka.GulpApp
+
 /**
  * @author rajthilak
  *
  */
 class GulpMaster extends Actor with ActorLogging {
-  
+
   import org.megam.akka.master.MasterWorkerProtocol._
   import scala.collection.mutable.{ Map, Queue }
   import org.megam.akka.gulps.GulpProtocol._
-  
+
   val cluster = Cluster(context.system)
   val name = "gulpactor"
-
+  val nodeName = "nodeactor"
   // Holds known workers and what they may be working on
   val workers = Map.empty[ActorRef, Option[Tuple2[ActorRef, Any]]]
-  
+
   // Holds the incoming list of work to be done as well
   // as the memory of who asked for it
   val workQ = Queue.empty[Tuple2[ActorRef, Any]]
-  log.info("GulpMaster Started")  
+  log.info("GulpMaster Started")
   val identifyId = 1
-
+  val nodeIdentifyId = 2
+  val watchIdentifyId = 3
   // Notifies workers that there's work available, provided they're
   // not already working on something
   def notifyWorkers(): Unit = {
@@ -72,7 +74,8 @@ class GulpMaster extends Actor with ActorLogging {
      * 
      */
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamgulp", name))) ! Identify(identifyId)
-
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamgulp", nodeName))) ! Identify(nodeIdentifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamgulp", "watchactor"))) ! Identify(watchIdentifyId)
     /**
      * Send out a CloReg to closervice stating that a new master is up.
      */
@@ -86,6 +89,12 @@ class GulpMaster extends Actor with ActorLogging {
 
     case ActorIdentity(`identifyId`, Some(ref)) ⇒
       ref ! MasterRegistration
+
+    case ActorIdentity(`nodeIdentifyId`, Some(ref)) ⇒
+      ref ! NodeReg
+
+    case ActorIdentity(`watchIdentifyId`, Some(ref)) ⇒
+      ref ! WatchReg
 
     // Worker is alive. Add him to the list, watch him for
     // death, and let him know if there's work to be done
@@ -137,5 +146,5 @@ class GulpMaster extends Actor with ActorLogging {
       workQ.enqueue(sender -> work)
       notifyWorkers()
   }
-  
+
 }

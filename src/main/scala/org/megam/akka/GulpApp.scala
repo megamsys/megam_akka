@@ -50,6 +50,8 @@ class GulpApp extends Bootable {
     Cluster(gulpsystem).subscribe(clusterListener, classOf[ClusterDomainEvent])
      gulpsystem.actorOf(Props[GulpActor], name = "gulpactor")
      gulpsystem.actorOf(Props[GulpMaster], name = "gulpmaster")
+     gulpsystem.actorOf(Props[NodeInstanceActor], name = "nodeactor")
+     gulpsystem.actorOf(Props[WatchActor], name = "watchactor")
   }
 
   //Create 10 workers, use a "configurable flag" and Range over it to create the workers

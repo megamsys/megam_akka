@@ -36,6 +36,7 @@ import com.twitter.zk._
 import com.twitter.util.{ Duration, Promise, TimeoutException, Timer, Return, Await }
 import org.apache.zookeeper.data.{ ACL, Stat }
 import org.apache.zookeeper.KeeperException
+import org.megam.akka.master.MasterWorkerProtocol._
 /**
  * @author ram
  *
@@ -85,7 +86,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         case CloJob(x) => {          
            val id = jsonValue(msg)
           context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", "nodeactor"))) ! new NodeJob(id)
-          val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
+          //val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
           
         }
         case NodeJob(x) => {        
