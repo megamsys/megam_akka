@@ -5,7 +5,7 @@ resolvers += Resolver.url("Typesafe Snapshots", url("http://repo.typesafe.com/ty
 
 resolvers += Resolver.url("Akka Snapshots", url("http://repo.akka.io/snapshots/"))
 
-addSbtPlugin("com.typesafe.akka" % "akka-sbt-plugin" % "2.2-M3")
+addSbtPlugin("com.typesafe.akka" % "akka-sbt-plugin" % "2.2.0")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.2.0")
 
