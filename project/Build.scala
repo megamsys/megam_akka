@@ -70,7 +70,7 @@ object Dependency {
     val scalaCheckVersion = "1.10.1"
     val scalazVersion = "7.0.0"
     val liftJsonVersion = "2.5"
-    val Zk = "6.3.6"
+    val Zk = "6.3.7"
     val Mg = "0.1.0-SNAPSHOT"
   }
 
