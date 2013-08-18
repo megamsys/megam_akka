@@ -68,9 +68,9 @@ object Dependency {
   object V {
     val Akka = "2.2.0"
     val scalaCheckVersion = "1.10.1"
-    val scalazVersion = "7.0.0"
+    val scalazVersion = "7.0.3"
     val liftJsonVersion = "2.5"
-    val Zk = "6.3.7"
+    val Zk = "6.3.8"
     val Mg = "0.1.0-SNAPSHOT"
   }
 
@@ -88,7 +88,7 @@ object Dependency {
   val scalaz_concurrent = "org.scalaz" %% "scalaz-concurrent" % V.scalazVersion
   val lift_json = "net.liftweb" %% "lift-json-scalaz7" % V.liftJsonVersion
   val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalaCheckVersion % "test"
-  val util_log = "com.twitter" % "util-logging_2.10" % "6.3.6"
-  val util_core = "com.twitter" % "util-core_2.10" % "6.3.6"
+  val util_log = "com.twitter" % "util-logging_2.10" %  V.Zk
+  val util_core = "com.twitter" % "util-core_2.10" %  V.Zk
   val zk = "com.twitter" % "util-zk_2.10" % V.Zk
 }
