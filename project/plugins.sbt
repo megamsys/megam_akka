@@ -11,6 +11,6 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.2.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.5.4")
 
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.7")
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.6")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-s3" % "0.5")
