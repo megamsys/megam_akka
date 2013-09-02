@@ -1,0 +1,7 @@
+#!/bin/sh
+
+AKKA_HOME="$(cd "$(cd "$(dirname "$0")"; pwd -P)"/..; pwd)"
+AKKA_CLASSPATH="$AKKA_HOME/config:$AKKA_HOME/lib/*"
+JAVA_OPTS="-Xms256M -Xmx512M"
+
+java $JAVA_OPTS -cp "$AKKA_CLASSPATH" -Dakka.home="$AKKA_HOME" akka.kernel.Main "$@"

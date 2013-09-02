@@ -22,6 +22,7 @@ import akka.actor.ActorPath
 import akka.actor.ActorSystem
 import akka.actor.Terminated
 import org.megam.akka.CloService
+import org.megam.akka.Constants._
 import akka.actor.Props
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
@@ -39,15 +40,14 @@ class CloMaster extends Actor with ActorLogging {
   import org.megam.akka.CloProtocol._
 
   val cluster = Cluster(context.system)
-  val cloName = "closervice"
-  val nodeName = "nodeactor"
+  val cloName = CLOSERVICE
+  val nodeName = NODEACTOR
   // Holds known workers and what they may be working on
   val workers = Map.empty[ActorRef, Option[Tuple2[ActorRef, Any]]]
 
   // Holds the incoming list of work to be done as well
   // as the memory of who asked for it
   val workQ = Queue.empty[Tuple2[ActorRef, Any]]
-  log.info("CloMaster Started")
   val cloIdentifyId = 1
   val nodeIdentifyId = 2
   // Notifies workers that there's work available, provided they're
@@ -62,7 +62,7 @@ class CloMaster extends Actor with ActorLogging {
   }
 
   override def preStart(): Unit = {
-    log.info("CloMaster preStart Started")
+    log.info("[{}]: >>  {} --> {}","CloMaster","preStart","Entry")
     cluster.subscribe(self, classOf[MemberEvent])
     cluster.subscribe(self, classOf[UnreachableMember])
 
@@ -75,9 +75,8 @@ class CloMaster extends Actor with ActorLogging {
      */
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", cloName))) ! Identify(cloIdentifyId)
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", nodeName))) ! Identify(nodeIdentifyId)
-    /**
-     * Send out a CloReg to closervice stating that a new master is up.
-     */
+    log.info("[{}]: >>  {} --> {}","CloMaster","preStart","Entry")
+    
   }
 
   override def postStop(): Unit = {
@@ -138,40 +137,9 @@ class CloMaster extends Actor with ActorLogging {
     // Anything other than our own protocol is "work to be done"
     case work =>
       log.info("Queueing {}", work)
-      println("=="+sender+"===="+work)
+      println("==" + sender + "====" + work)
       workQ.enqueue(sender -> work)
       notifyWorkers()
   }
 
 }
-
-
-/*
-
-
-  def worker(name: String) = system.actorOf(Props(
-    new Slave(ActorPath.fromString(
-      "akka://%s/user/%s".format(system.name, name)))))
-
-  
-      val m = system.actorOf(Props[Master], "clomaster")
-      // Create 10 workers
-      val w1 = worker("clomaster")
-      val w2 = worker("clomaster")
-      val w3 = worker("clomaster")
-      val w4 = worker("clomaster")
-      val w5 = worker("clomaster")
-      val w6 = worker("clomaster")
-      val w7 worker("clomaster")
-      val w8 = worker("clomaster")
-      val w9 = worker("clomaster")
-      val w10 = worker("clomaster")
-     
-      // Send some work to the master
-      m ! "Hithere"
-      m ! "Guys"
-      m ! "So"
-      m ! "What's"
-      m ! "Up?"
-   
-*/

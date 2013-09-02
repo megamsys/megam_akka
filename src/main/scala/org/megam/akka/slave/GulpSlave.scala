@@ -22,17 +22,18 @@ import akka.actor.ActorPath
 import akka.actor.ActorRef
 import akka.pattern.pipe
 import scala.concurrent.Future
+import org.megam.akka.Constants._
+import org.megam.akka.extn.Settings
 import org.megam.akka.gulps.GulpProtocol._
+import org.megam.akka.master.MasterWorkerProtocol._
 import net.liftweb.json._
 import scala.io.Source
 import java.io.File
-import org.megam.akka.master.MasterWorkerProtocol._
 import org.megam.common._
 import com.twitter.zk._
 import com.twitter.util.{ Duration, Promise, TimeoutException, Timer, Return, Await }
 import org.apache.zookeeper.data.{ ACL, Stat }
 import org.apache.zookeeper.KeeperException
-import org.megam.akka.extn.Settings
 /**
  * @author rajthilak
  *
@@ -47,7 +48,7 @@ class GulpSlave(masterLocation: ActorPath) extends AbstractSlave(masterLocation)
   implicit val formats = DefaultFormats
   val settings = Settings(context.system)
   val uris = settings.ZooUri
-  val findMe = "|^^^/@\"^^^|"
+  val findMe = "|\"/|"
   log.info("Gulp Slave started")
 
   def doWork(workSender: ActorRef, msg: Any): Unit = {
@@ -61,8 +62,8 @@ class GulpSlave(masterLocation: ActorPath) extends AbstractSlave(masterLocation)
             val data = parse(lines mkString).extract[Queue_gulpinfo]
             val zoo = new Zoo(uris, "nodes")
             zoo.create(data.name, "Running")
-            context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamgulp", "nodeactor"))) ! new NodeJob(data.name)
-            context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamgulp", "watchactor"))) ! new WatchJob((zoo.zknode).path)
+            context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMGULP, NODEACTOR))) ! new NodeJob(data.name)
+            context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMGULP, WATCHACTOR))) ! new WatchJob((zoo.zknode).path)
           })
         }
         case NodeJob(x) => {

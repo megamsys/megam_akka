@@ -42,7 +42,7 @@ class WatchActor extends Actor with ActorLogging {
   val jobCounter: AtomicInteger = new AtomicInteger(0)
   log.info("==================================Watch Actor Started========================================")
   val settings = Settings(context.system)
-  val findMe = "|^^^/@\"^^^|"
+  val findMe = "|_!_|"
 
   override def preStart(): Unit = {
     log.debug("{} Starting ========={}", findMe, "WatchActor....")

@@ -25,6 +25,7 @@ import akka.actor.Props
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.cluster.MemberStatus
+import org.megam.akka.Constants._
 import org.megam.akka.GulpApp
 
 /**
@@ -38,8 +39,8 @@ class GulpMaster extends Actor with ActorLogging {
   import org.megam.akka.gulps.GulpProtocol._
 
   val cluster = Cluster(context.system)
-  val name = "gulpactor"
-  val nodeName = "nodeactor"
+  val name = GULPACTOR
+  val nodeName = NODEACTOR
   // Holds known workers and what they may be working on
   val workers = Map.empty[ActorRef, Option[Tuple2[ActorRef, Any]]]
 
@@ -73,9 +74,9 @@ class GulpMaster extends Actor with ActorLogging {
      * and automatically reply to with a ActorIdentity message containing the ActorRef.
      * 
      */
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamgulp", name))) ! Identify(identifyId)
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamgulp", nodeName))) ! Identify(nodeIdentifyId)
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamgulp", "watchactor"))) ! Identify(watchIdentifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMGULP, name))) ! Identify(identifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMGULP, nodeName))) ! Identify(nodeIdentifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMGULP, "watchactor"))) ! Identify(watchIdentifyId)
     /**
      * Send out a CloReg to closervice stating that a new master is up.
      */

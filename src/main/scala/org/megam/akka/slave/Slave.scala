@@ -71,7 +71,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         mm
       }
       case NodeJob(x) => {
-        val json = parse(x)      
+        val json = parse(x)
         val m = json.extract[MessageJson]
         m.body
       }
@@ -81,15 +81,14 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
 
   def doWork(workSender: ActorRef, msg: Any): Unit = {
     Future {
-      workSender ! msg     
+      workSender ! msg
       msg match {
-        case CloJob(x) => {          
-           val id = jsonValue(msg)
+        case CloJob(x) => {
+          val id = jsonValue(msg)
+          val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
           context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", "nodeactor"))) ! new NodeJob(id)
-          //val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
-          
         }
-        case NodeJob(x) => {        
+        case NodeJob(x) => {
           val zoo = new Zoo(uris, "nodes")
           zoo.create(x, "Request ID started")
         }
