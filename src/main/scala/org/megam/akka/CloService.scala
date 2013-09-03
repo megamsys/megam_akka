@@ -50,7 +50,6 @@ class CloService extends Actor with ActorLogging {
   var clomasters = IndexedSeq.empty[ActorRef]
 
   val jobCounter: AtomicInteger = new AtomicInteger(0)
-  log.info("==================================CloService Started========================================")
   val settings = Settings(context.system)
   val uris = settings.AMQPUri
   val exchange_name = settings.exchange
@@ -59,13 +58,13 @@ class CloService extends Actor with ActorLogging {
   val findMe = "[^-^|"
 
   override def preStart(): Unit = {
-    log.debug("{} Starting {}", findMe, "CloService.")
+    log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "preStart", "Entry")
     val rmq = new RabbitMQClient(uris, exchange_name, queue_name)
     execute(rmq.subscribe(qThirst, routingKey))
   }
 
   override def postStop(): Unit = {
-    log.debug("{} Stopping {} App. Not implemented yet.", findMe, "CloService....")
+    log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "postStop", "TO-DO: Not implemented yet.")
   }
 
   protected def execute(ampq_request: AMQPRequest, duration: Duration = org.megam.common.concurrent.duration) = {
@@ -88,15 +87,14 @@ class CloService extends Actor with ActorLogging {
       clomasters(jobCounter.getAndIncrement() % clomasters.size) forward job
     }
     case result: CloRes  => println(result)
-    case failed: CloFail => log.info("{} CloFail.{}", findMe, failed)
+    case failed: CloFail => log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "CloFail", failed)
     case CloReg if !clomasters.contains(sender) => {
       context watch sender
       clomasters = clomasters :+ sender
-      log.info("=========CloReg created============")
-      log.debug("{} CloReg.{}", findMe, clomasters.size)
+      log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "CloReg", clomasters.size)
     }
     case Terminated(a) => {
-      log.debug("{} Terminated.{}", findMe, clomasters.size)
+      log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "Terminated", clomasters.size)
       clomasters = clomasters.filterNot(_ == a)
     }
 
@@ -108,11 +106,11 @@ class CloService extends Actor with ActorLogging {
    * be CloService"
    */
   def qThirst(h: AMQPResponse) = {
-    log.info("{} Quench.{}", findMe, "CloService")
+    log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "qThirst", h.toJson(true))
     val result = h.toJson(false).some // the response is parsed back       
     val res: ValidationNel[Throwable, Option[String]] = result match {
       case Some(resp) => {
-        log.info("{} Quench.{}", findMe, "Successs ...." + resp)
+        log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "qThirst", "Received some")
         self ! new CloJob(result.getOrElse("none-clores"))
         result.successNel
       }

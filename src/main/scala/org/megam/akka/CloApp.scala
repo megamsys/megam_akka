@@ -60,12 +60,14 @@ class CloApp extends Bootable {
 
     //Every cluster[megamcloud_cluster] starts with a closervice and master=><x number of workers>     
     system.actorOf(Props[CloService], name = CLOSERVICE)
+    //TO-DO: Why do we need a NodeActor here ? Hmm.. may be everything is a node ?
     system.actorOf(Props[NodeInstanceActor], name = NODEACTOR)
     system.actorOf(Props[CloMaster], name = CLOMASTER)
 
     //TO-DO: Create <x> workers, use a "configurable flag (clo.workers=10) in the settings file" 
-    println("Booting up Megam: Cloud Bridge 0.1")
     val clo_workers = 1 to 10 map { x => worker(CLOMASTER) }
+    println("[MEGAM]: >> Clo Workers --> created")
+
   }
 
   def worker(name: String) =

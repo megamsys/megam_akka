@@ -68,10 +68,8 @@ class GulpActor extends Actor with ActorLogging {
   override def preStart(): Unit = {
     log.debug(("%-20s -->[%s]").format("GulpActor", "preStart:Entry"))
     val nodeBootPath = scala.util.Properties.envOrElse("MEGAM_HOME", scala.util.Properties.userHome)
-
-    val str1 = new java.io.File("/home/ubuntu/.megam/").listFiles.filter(_.getName.endsWith(".json"))
-
-    str1.map(a => {
+    val nodeJsons = new java.io.File(nodeBootPath).listFiles.filter(_.getName.endsWith(".json"))
+    nodeJsons.map(a => {
       val lines = Source.fromFile(a)
       val data = parse(lines mkString).extract[Queue_info]
       val rmq = new RabbitMQClient(uris, data.exchange, data.queue)

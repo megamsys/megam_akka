@@ -57,7 +57,8 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   // You can use whatever you want.
   implicit val ec = context.dispatcher
   implicit val formats = DefaultFormats
-  println("Slave started")
+  log.info("[{}]: >>  {} --> {}", "Slave", "Started", "Entry")
+
   val settings = Settings(context.system)
   val uris = settings.ZooUri
   val nodeName = "nodeactor"
@@ -84,11 +85,23 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
       workSender ! msg
       msg match {
         case CloJob(x) => {
+          //TO-DO: separate it into individual computation of monads.
+          log.info("[{}]: >>  {} --> {}", "Slave", "Future", msg)
           val id = jsonValue(msg)
-          val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
-          context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", "nodeactor"))) ! new NodeJob(id)
+          log.info("[{}]: >>  {} --> {}", "Slave", "id", id)
+          Validation.fromTryCatch {
+            (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
+          } leftMap { t: Throwable =>
+            val u = new java.io.StringWriter
+            t.printStackTrace(new java.io.PrintWriter(u))
+            log.error("[{}]: >>  {} --> {}", "Slave-" + id, "Future:Failure", u.toString)
+            t
+          } flatMap { x => 
+            (context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", "nodeactor"))) ! new NodeJob(id)).successNel
+          }
         }
         case NodeJob(x) => {
+          log.info("[{}]: >>  {} --> {}", "Slave", "NodeJob", x)
           val zoo = new Zoo(uris, "nodes")
           zoo.create(x, "Request ID started")
         }
@@ -97,23 +110,3 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
     } pipeTo self
   }
 }
-
-/**
-// Downloading could take a while :)
-implicit val askTimeout = Timeout(5 minutes)
- 
-// Some list of URLs we want to download
-val urls = List(url1, ulr2, url3, ..., urlN)
- 
-// The Master
-val m = system.actorOf(Props[Master], "master")
- 
-// Assume Workers are now present
- 
-// Get a Future to a bunch of eventual downloaded pages
-Future.sequence(urls.map { url =>
-m ? Download(url)
-}) map { pages =>
-PagesReady(pages)
-} pipeTo pageRenderer
-**/

@@ -47,7 +47,7 @@ class GulpApp extends Bootable {
           log.info("Member detected as unreachable: {}", member)
         case _: ClusterDomainEvent ⇒ // ignore
       }
-    }), name = "clusterlistener")
+    }), name = "gulpclusterlistener")
     Cluster(gulpsystem).subscribe(clusterListener, classOf[ClusterDomainEvent])
      gulpsystem.actorOf(Props[GulpActor], name = GULPACTOR)
      gulpsystem.actorOf(Props[GulpMaster], name = GULPMASTER)
