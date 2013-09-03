@@ -76,6 +76,7 @@ object Dependency {
 
   val akkaKernel = "com.typesafe.akka" %% "akka-kernel" % V.Akka
   val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % V.Akka
+  val akkalogback = "ch.qos.logback" % "logback-classic" % "1.0.13"
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.Akka
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
   val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka 
