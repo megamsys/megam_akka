@@ -76,7 +76,7 @@ class GulpMaster extends Actor with ActorLogging {
      */
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMGULP, name))) ! Identify(identifyId)
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMGULP, nodeName))) ! Identify(nodeIdentifyId)
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMGULP, "watchactor"))) ! Identify(watchIdentifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMGULP, WATCHACTOR))) ! Identify(watchIdentifyId)
     /**
      * Send out a CloReg to closervice stating that a new master is up.
      */

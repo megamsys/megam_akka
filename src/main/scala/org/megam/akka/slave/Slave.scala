@@ -28,6 +28,7 @@ import org.megam.chef.ChefServiceRunner
 import org.megam.chef.DropIn
 import org.megam.chef.ProvisionerFactory.TYPE
 import org.megam.chef.exception._
+import org.megam.akka.Constants._
 import org.megam.akka.extn.Settings
 import org.megam.common._
 import com.twitter.zk._
@@ -95,7 +96,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
             log.error("[{}]: >>  {} --> {}", "Slave-" + id, "Future:Failure", u.toString)
             t
           } flatMap { x => 
-            (context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", "nodeactor"))) ! new NodeJob(id)).successNel
+            (context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, NODEACTOR))) ! new NodeJob(id)).successNel
           }
         }
         case NodeJob(x) => {

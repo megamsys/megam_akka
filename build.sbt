@@ -119,3 +119,5 @@ host in download := "megampub.s3.amazonaws.com"
 //host in delete := "megampub.s3.amazonaws.com"
 
 credentials += Credentials(Path.userHome / "software" / "aws" / "keys" / "sbt_s3_keys")
+
+S3.progress in S3.upload := true

@@ -106,13 +106,14 @@ class CloService extends Actor with ActorLogging {
    * be CloService"
    */
   def qThirst(h: AMQPResponse) = {
-    log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "qThirst", h.toJson(true))
-    val result = h.toJson(false).some // the response is parsed back       
-    val res: ValidationNel[Throwable, Option[String]] = result match {
+    log.info("[{}]: >>  {} --> {}", "CloService", findMe + "qThirst", h.toJson(true))
+    val result = h.toJson(false) // the response is parsed back    
+    println("Received "+result)
+    self ! new CloJob(result)
+    val res: ValidationNel[Throwable, Option[String]] = result.some match {
       case Some(resp) => {
-        log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "qThirst", "Received some")
-        self ! new CloJob(result.getOrElse("none-clores"))
-        result.successNel
+        log.info("[{}]: >>  {} --> {}", "CloService", findMe + "qThirst", "Received some")
+        result.some.successNel
       }
       case None => new java.lang.Error("I received nothing in the amqp response for my subscription, contains invalid JSON. counldn't parse it.").failNel
     }

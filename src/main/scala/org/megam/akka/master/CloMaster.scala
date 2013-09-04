@@ -72,8 +72,8 @@ class CloMaster extends Actor with ActorLogging {
      * There is a built-in Identify message that all Actors will understand 
      * and automatically reply to with a ActorIdentity message containing the ActorRef.
      */
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", cloName))) ! Identify(cloIdentifyId)
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", nodeName))) ! Identify(nodeIdentifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, cloName))) ! Identify(cloIdentifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, nodeName))) ! Identify(nodeIdentifyId)
     log.info("[{}]: >>  {} --> {}", "CloMaster", "preStart", "Entry")
 
   }
