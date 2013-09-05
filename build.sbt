@@ -54,7 +54,7 @@ resolvers += "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.or
 resolvers += "Twitter Repo" at "http://maven.twttr.com"
 
 linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
-  (packageMapping((bd / "target/megam_akka/bin/start") -> "/usr/local/share/megamakka/bin/start")
+  (packageMapping((bd / "bin/start") -> "/usr/local/share/megamakka/bin/start")
    withUser "root" withGroup "root" withPerms "0755")
 }
 
