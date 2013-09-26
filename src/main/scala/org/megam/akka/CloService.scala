@@ -58,9 +58,12 @@ class CloService extends Actor with ActorLogging {
   val findMe = "[^-^|"
 
   override def preStart(): Unit = {
+    println("CloService preStart Entry")
     log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "preStart", "Entry")  
     val rmq = new RabbitMQClient(uris, exchange_name, queue_name)
     execute(rmq.subscribe(qThirst, routingKey))
+    println("CloService prestart Exit")
+
   }
 
   override def postStop(): Unit = {

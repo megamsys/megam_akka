@@ -3,10 +3,6 @@ import Process._
 import com.typesafe.sbt.SbtNativePackager._
 import com.typesafe.sbt.packager.debian.Keys._
 import com.typesafe.sbt.packager.linux.LinuxPackageMapping
-import sbtrelease._
-import ReleasePlugin._
-import ReleaseKeys._
-import org.scalastyle.sbt.ScalastylePlugin
 import S3._
 
 seq(packagerSettings:_*)
@@ -18,8 +14,6 @@ packageSummary := "Cloud Bridge for Megam."
 packageDescription in Debian:= "Cloud bridge to cloud manage megam platform. "
 
 com.typesafe.sbt.packager.debian.Keys.name in Debian := "megamakka"
-
-ScalastylePlugin.Settings
 
 s3Settings
 

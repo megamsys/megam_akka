@@ -74,7 +74,7 @@ class CloMaster extends Actor with ActorLogging {
      */
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, cloName))) ! Identify(cloIdentifyId)
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, nodeName))) ! Identify(nodeIdentifyId)
-    log.info("[{}]: >>  {} --> {}", "CloMaster", "preStart", "Entry")
+    log.info("[{}]: >>  {} --> {}", "CloMaster", "preStart", "Exit")
 
   }
 

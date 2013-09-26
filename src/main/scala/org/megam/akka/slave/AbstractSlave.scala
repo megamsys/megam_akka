@@ -70,11 +70,11 @@ abstract class AbstractSlave(masterLocation: ActorPath)
   def idle: Receive = {
     // Master says there's work to be done, let's ask for it
     case WorkIsReady =>
-      log.info("[{}]: >>  {} --> {}", "AbstractSlave", "WorkIsReady", "Howdy is there work ?")
+      log.info("[{}]: >>  {} --> {}", "AbstractSlave:"+ masterLocation.name, "WorkIsReady", "Howdy is there work ?")
       master ! WorkerRequestsWork(self)
     // Send the work off to the implementation
     case WorkToBeDone(work) =>
-      log.info("[{}]: >>  {} --> {}", "AbstractSlave", "WorkToBeDone", "Hey Got Work.")
+      log.info("[{}]: >>  {} --> {}", "AbstractSlave:"+masterLocation.name, "WorkToBeDone", "Hey Got Work.")
       doWork(sender, work)
       context.become(working(work))
     // We asked for it, but either someone else got it first, or

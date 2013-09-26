@@ -59,35 +59,22 @@ object Dependencies {
   import Dependency._
 
   val megamAkkaKernel = Seq(
-    akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaCluster, sigar, zk_common, mg, mc, scalaz, scalaz_effect,
-    scalaz_concurrent, lift_json, scalacheck, util_core, zk)
+    akkaKernel, akkaSlf4j, akkaActor, akkaRemote, akkaCluster, sigar, snowflake, mg, mc)
 }
 
 object Dependency {
   // Versions
   object V {
     val Akka = "2.2.1"
-    val scalaCheckVersion = "1.10.1"
-    val scalazVersion = "7.0.3"
-    val liftJsonVersion = "2.5"
-    val Zk = "6.3.8"
     val Mg = "0.1.0-SNAPSHOT"
   }
-
+  val snowflake = "com.twitter.service" % "snowflake" % "1.0.2" from "https://s3-ap-southeast-1.amazonaws.com/megampub/0.1/jars/snowflake.jar"
   val akkaKernel = "com.typesafe.akka" %% "akka-kernel" % V.Akka
   val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % V.Akka
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.Akka
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
   val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka 
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
-  val zk_common = "com.twitter" % "util-zk-common_2.10" % V.Zk
   val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg
   val mc = "com.github.indykish" % "megam_chef" % V.Mg
-  val scalaz = "org.scalaz" %% "scalaz-core" % V.scalazVersion
-  val scalaz_effect = "org.scalaz" %% "scalaz-effect" % V.scalazVersion
-  val scalaz_concurrent = "org.scalaz" %% "scalaz-concurrent" % V.scalazVersion
-  val lift_json = "net.liftweb" %% "lift-json-scalaz7" % V.liftJsonVersion
-  val scalacheck = "org.scalacheck" %% "scalacheck" % V.scalaCheckVersion % "test"
-  val util_core = "com.twitter" % "util-core_2.10" %  V.Zk
-  val zk = "com.twitter" % "util-zk_2.10" % V.Zk
 }

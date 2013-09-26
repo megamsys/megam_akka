@@ -56,11 +56,13 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   // You can use whatever you want.
   implicit val ec = context.dispatcher
   implicit val formats = DefaultFormats
-  log.info("[{}]: >>  {} --> {}", "Slave", "Started", "Entry")
+ 
+  log.info("[{}]: >>  {} --> {}", "Slave:"+masterLocation.name, "Started", "Entry")
 
   val settings = Settings(context.system)
   val uris = settings.ZooUri
-  val nodeName = "nodeactor"
+
+  
   def jsonValue(msg: Any): String = {
     msg match {
       case CloJob(x) => {
