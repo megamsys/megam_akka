@@ -85,8 +85,8 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
       msg match {
         case CloJob(x) => {          
            val id = jsonValue(msg)
-          context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", "nodeactor"))) ! new NodeJob(id)
-          //val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
+           val chefObject = (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
+          context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format("megamcluster", "nodeactor"))) ! new NodeJob(id)     
           
         }
         case NodeJob(x) => {        

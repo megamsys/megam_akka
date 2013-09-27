@@ -17,7 +17,7 @@ packageSummary := "Cloud instrumentation agents."
 
 packageDescription in Debian:= "Cloud instrumentation allows the lifecycle of cloud infrastructure provisioning to be managed, ease repeatable deployments, change the behaviour of instances by injecting behaviour. "
 
-com.typesafe.sbt.packager.debian.Keys.name in Debian := "megam_akka"
+com.typesafe.sbt.packager.debian.Keys.name in Debian := "megamakka"
 
 ScalastylePlugin.Settings
 
@@ -69,8 +69,6 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   (packageMapping((bd / "target/megam_akka/config/application.conf") -> "/usr/local/share/megamakka/config/application.conf")
    withConfig())
 }
-
-
  
 com.typesafe.sbt.packager.debian.Keys.version in Debian <<= (com.typesafe.sbt.packager.debian.Keys.version, sbtVersion) apply { (v, sv) =>
   sv + "-build-" + (v split "\\." map (_.toInt) dropWhile (_ == 0) map ("%02d" format _) mkString "")
@@ -93,15 +91,15 @@ linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.source
 }
 
 
-mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamakka", "0.12.4-build-0100")),"debs/megam_akka0.1.0.deb"))
+mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamakka", "0.12.4-build-0100")),"0.1/debs/megam_akka.deb"))
 
 host in upload := "megampub.s3.amazonaws.com"
 
-mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamakka", "0.12.4-build-0100")),"debs/megam_akka0.1.0.deb"))
+mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamakka", "0.12.4-build-0100")),"0.1/debs/megam_akka.deb"))
 
 host in download := "megampub.s3.amazonaws.com"
 
-//mappings in delete := Seq("debs/megam_akka0.1.0.deb")
+//mappings in delete := Seq("debs/megam_akka.deb")
 
 //host in delete := "megampub.s3.amazonaws.com"
 
