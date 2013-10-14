@@ -23,36 +23,51 @@ import akka.sbt.AkkaKernelPlugin.{ Dist, outputDirectory, distJvmOptions, additi
 
 object MegamAkkaKernel extends Build {
 
-   val Organization = "org.megam"
-  val Version      = "0.1.0-SNAPSHOT"
+  val Organization = "org.megam"
+  val Version = "0.1.0-SNAPSHOT"
   val ScalaVersion = "2.10.2"
 
-lazy val megamAkka = Project(
+  lazy val megamAkka = Project(
     id = "megam_akka",
     base = file("."),
     settings = Defaults.defaultSettings ++ AkkaKernelPlugin.distSettings ++ Seq(
       libraryDependencies ++= Dependencies.megamAkkaKernel,
+      resolvers := HerkResolvers.All,
       distJvmOptions in Dist := "-Xms256M -Xmx512M",
       additionalLibs in Dist := Seq(new java.io.File("lib/libsigar-amd64-linux-1.6.4.so")),
-      outputDirectory in Dist := file("target/megam_akka")))   
-
+      outputDirectory in Dist := file("target/megam_akka")))
 
   lazy val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := Organization,
     version := Version,
-    scalaVersion := ScalaVersion,   
+    scalaVersion := ScalaVersion,
     crossPaths := false,
     organizationName := "Megam Systems.",
     organizationHomepage := Some(url("http://www.megam.co")))
 
-
-
   lazy val defaultSettings = buildSettings ++ Seq(
-      // compile options
-      scalacOptions ++= Seq ("-encoding", "UTF-8", "-deprecation", "-unchecked"),
-      javacOptions ++= Seq ("-Xlint:unchecked", "-Xlint:deprecation"))       
-  
+    scalacOptions ++= Seq(
+      "-unchecked",
+      "-deprecation",
+      "-feature",
+      "-Xcheckinit",
+      "-Xlint",
+      "-Xverify",
+      "-Yinline-warnings",
+      "-Yclosure-elim",
+      "-language:postfixOps",
+      "-language:implicitConversions",
+      "-Ydead-code"),
+    javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation"))
+}
 
+object HerkResolvers {
+  val akkasp = "Akka Snapshots Repo" at "http://repo.akka.io/snapshots"
+  val typesp = "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots"
+  val sonasp = "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+  val scatsp = "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
+
+  val All = Seq(akkasp, typesp, sonasp, scatsp)
 }
 
 object Dependencies {
@@ -73,7 +88,7 @@ object Dependency {
   val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % V.Akka
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % V.Akka
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
-  val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka 
+  val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
   val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg
   val mc = "com.github.indykish" % "megam_chef" % V.Mg
