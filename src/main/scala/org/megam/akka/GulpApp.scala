@@ -19,6 +19,7 @@ import akka.actor._
 import akka.kernel.Bootable
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
+import org.megam.akka.Constants._
 import org.megam.akka.gulps._
 import org.megam.akka.slave._
 import com.typesafe.config.ConfigFactory
@@ -35,7 +36,7 @@ import com.typesafe.config.ConfigFactory
  */
 class GulpApp extends Bootable {  
   
-  val gulpsystem = ActorSystem("megamgulp")
+  val gulpsystem = ActorSystem(MEGAMGULP)
   def startup = {
     val clusterListener = gulpsystem.actorOf(Props(new Actor with ActorLogging {
       def receive = {
@@ -46,26 +47,18 @@ class GulpApp extends Bootable {
           log.info("Member detected as unreachable: {}", member)
         case _: ClusterDomainEvent ⇒ // ignore
       }
-    }), name = "clusterlistener")
+    }), name = "gulpclusterlistener")
     Cluster(gulpsystem).subscribe(clusterListener, classOf[ClusterDomainEvent])
-     gulpsystem.actorOf(Props[GulpActor], name = "gulpactor")
-     gulpsystem.actorOf(Props[GulpMaster], name = "gulpmaster")
-     gulpsystem.actorOf(Props[NodeInstanceActor], name = "nodeactor")
-     gulpsystem.actorOf(Props[WatchActor], name = "watchactor")
+     gulpsystem.actorOf(Props[GulpActor], name = GULPACTOR)
+     gulpsystem.actorOf(Props[GulpMaster], name = GULPMASTER)
+     gulpsystem.actorOf(Props[NodeInstanceActor], name = NODEACTOR)
+     gulpsystem.actorOf(Props[WatchActor], name = WATCHACTOR)
   }
 
-  //Create 10 workers, use a "configurable flag" and Range over it to create the workers
-    val w1 = worker("gulpmaster")
-    val w2 = worker("gulpmaster")
-    val w3 = worker("gulpmaster")
-    val w4 = worker("gulpmaster")
-    val w5 = worker("gulpmaster")
-    val w6 = worker("gulpmaster")
-    val w7 = worker("gulpmaster")
-    val w8 = worker("gulpmaster")
-    val w9 = worker("gulpmaster")
-    val w10 = worker("gulpmaster")
- 
+  //TO-DO: Create <x> workers, use a "configurable flag (clo.workers=10) in the settings file" 
+    println("Booting up Megam: Cloud Node Gulp 0.1")
+    val gulp_workers = 1 to 10 map { x => worker(GULPMASTER) }
+     
 
   def worker(name: String) =
     gulpsystem.actorOf(Props(new GulpSlave(ActorPath.fromString("akka://%s/user/%s".format(gulpsystem.name, name)))))

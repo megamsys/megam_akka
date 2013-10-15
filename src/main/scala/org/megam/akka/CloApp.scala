@@ -15,62 +15,65 @@
 */
 package org.megam.akka
 
+import scalaz._
+import Scalaz._
 import akka.actor._
+import net.liftweb.json._
+import net.liftweb.json.scalaz.JsonScalaz._
 import akka.kernel.Bootable
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.cluster.MemberStatus
+import org.megam.akka.Constants._
 import org.megam.akka.master.CloMaster
 import org.megam.akka.slave._
 import org.megam.akka.master._
 import com.typesafe.config.ConfigFactory
+import org.megam.akka.extn.Settings
 /**
  * @author ram
  *
- * The megam_akk contains two apps. CloApp is the master cluster which starts up two actors
- * 1.closervice => closervice is responsible for connecting to the global subscriber queue and send a clojob
- * to the clomaster
- * 2.clomaster  => clomaster is responsible for executing  various workers to run the clojob. On completion this sends
- * a cloresult back.
+ * The megam_akka is a cloud bridge to cloud manage megam platform. It contains two main apps.
+ *  CloApp is the master cluster which starts up two actors
+ *      1)closervice => closervice is responsible for connecting to the global subscriber queue and send a clojob
+ *      to the clomaster
+ *      2)clomaster  => clomaster is responsible for executing  various workers to run the clojob. On completion this sends
+ *      a cloresult back.
+ *  GulpActor is the node actor which is started as a result of creation of a cloud_book from the interface (UI, CLI, Mob)
  */
 class CloApp extends Bootable {
 
-  println("---------------------Clo app Started---------------------")
-  val system = ActorSystem("megamcluster")
+  val system = ActorSystem(MEGAMCLOUD_CLUSTER)
 
-  var nodes = Set.empty[Address]
-  val servicename = "closervice"
+  var clo_clusters = Set.empty[Address]
+  val s = system.settings
+  val t_workers = org.megam.akka.Config.TotalWorker
+  
   def startup = {
+    println("[MEGAM]: >> Booting up Megam --> Cloud Bridge 0.1")
     val clusterListener = system.actorOf(Props(new Actor with ActorLogging {
       def receive = {
         case state: CurrentClusterState =>
-          nodes = state.members.collect {
+          clo_clusters = state.members.collect {
             case m if m.status == MemberStatus.Up ⇒ m.address
           }
-        case MemberUp(m)           => nodes += m.address
-        case other: MemberEvent    => nodes -= other.member.address
-        case UnreachableMember(m)  => nodes -= m.address
+        case MemberUp(m)           => clo_clusters += m.address
+        case other: MemberEvent    => clo_clusters -= other.member.address
+        case UnreachableMember(m)  => clo_clusters -= m.address
         case _: ClusterDomainEvent ⇒ // ignore
       }
-    }), name = "clusterlistener")
+    }), name = "cloclusterlistener")
     Cluster(system).subscribe(clusterListener, classOf[ClusterDomainEvent])
 
-    //Every cluster[megamcluster] starts with a closervice and master=><x number of workers>     
-    system.actorOf(Props[CloService], name = "closervice")
-    system.actorOf(Props[NodeInstanceActor], name = "nodeactor")
-    system.actorOf(Props[CloMaster], name = "clomaster")
+    //Every cluster[megamcloud_cluster] starts with a closervice and master=><x number of workers>     
+    system.actorOf(Props[CloService], name = CLOSERVICE)
+    //TO-DO: Why do we need a NodeActor here ? Hmm.. may be everything is a node ?
+    system.actorOf(Props[NodeInstanceActor], name = NODEACTOR)
+    system.actorOf(Props[CloMaster], name = CLOMASTER)
 
-    //Create 10 workers, use a "configurable flag" and Range over it to create the workers
-    val w1 = worker("clomaster")
-    val w2 = worker("clomaster")
-    val w3 = worker("clomaster")
-    val w4 = worker("clomaster")
-    val w5 = worker("clomaster")
-    val w6 = worker("clomaster")
-    val w7 = worker("clomaster")
-    val w8 = worker("clomaster")
-    val w9 = worker("clomaster")
-    val w10 = worker("clomaster")
+    //TO-DO: Create <x> workers, use a "configurable flag (clo.workers=10) in the settings file" 
+    val clo_workers = 1 to t_workers map { x => worker(CLOMASTER) }
+    println("[MEGAM]: >> Clo Workers --> created")
 
   }
 
@@ -78,6 +81,8 @@ class CloApp extends Bootable {
     system.actorOf(Props(new Slave(ActorPath.fromString("akka://%s/user/%s".format(system.name, name)))))
 
   def shutdown = {
+    //TO-DO: if the clo_clusters are not empty (clo_clusters, then send a message and gracefully shut it down
+    //       send a message to clo_workers and gracefully shut it down.
     system.shutdown()
   }
 }

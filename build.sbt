@@ -3,27 +3,37 @@ import Process._
 import com.typesafe.sbt.SbtNativePackager._
 import com.typesafe.sbt.packager.debian.Keys._
 import com.typesafe.sbt.packager.linux.LinuxPackageMapping
-import sbtrelease._
-import ReleasePlugin._
-import ReleaseKeys._
-import org.scalastyle.sbt.ScalastylePlugin
 import S3._
 
 seq(packagerSettings:_*)
 
 maintainer in Debian:= "Rajthilak <rajthilak@megam.co.in>"
 
-packageSummary := "Cloud instrumentation agents."
+packageSummary := "Cloud Bridge for Megam."
 
-packageDescription in Debian:= "Cloud instrumentation allows the lifecycle of cloud infrastructure provisioning to be managed, ease repeatable deployments, change the behaviour of instances by injecting behaviour. "
+packageDescription in Debian:= "Cloud bridge to cloud manage megam platform. "
 
 com.typesafe.sbt.packager.debian.Keys.name in Debian := "megamakka"
-
-ScalastylePlugin.Settings
 
 s3Settings
 
 scalaVersion := "2.10.2"
+
+scalacOptions := Seq(
+	"-unchecked", 
+	"-deprecation",
+	"-feature",
+ 	"-optimise",
+ 	"-explaintypes",
+  	"-Xcheckinit",
+  	"-Xlint",
+  	"-Xverify",  	
+  	"-Yinline-warnings",
+  	"-Ywarn-all",
+  	"-Yclosure-elim",
+  	"-language:postfixOps",
+  	"-language:implicitConversions",
+  	"-Ydead-code")
 
 resolvers += "akka" at "http://repo.akka.io/snapshots"
 
@@ -38,10 +48,9 @@ resolvers += "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.or
 resolvers += "Twitter Repo" at "http://maven.twttr.com"
 
 linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
-  (packageMapping((bd / "target/megam_akka/bin/start") -> "/usr/local/share/megamakka/bin/start")
+  (packageMapping((bd / "bin/start") -> "/usr/local/share/megamakka/bin/start")
    withUser "root" withGroup "root" withPerms "0755")
 }
-
 
 linuxPackageMappings <+= (baseDirectory) map { bd =>
   val src = bd / "target/megam_akka/lib"
@@ -69,7 +78,7 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   (packageMapping((bd / "target/megam_akka/config/application.conf") -> "/usr/local/share/megamakka/config/application.conf")
    withConfig())
 }
- 
+
 com.typesafe.sbt.packager.debian.Keys.version in Debian <<= (com.typesafe.sbt.packager.debian.Keys.version, sbtVersion) apply { (v, sv) =>
   sv + "-build-" + (v split "\\." map (_.toInt) dropWhile (_ == 0) map ("%02d" format _) mkString "")
 }
@@ -90,12 +99,12 @@ linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.source
   ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
 }
 
-
 mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamakka", "0.12.4-build-0100")),"0.1/debs/megam_akka.deb"))
 
 host in upload := "megampub.s3.amazonaws.com"
 
 mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamakka", "0.12.4-build-0100")),"0.1/debs/megam_akka.deb"))
+
 
 host in download := "megampub.s3.amazonaws.com"
 
@@ -104,3 +113,5 @@ host in download := "megampub.s3.amazonaws.com"
 //host in delete := "megampub.s3.amazonaws.com"
 
 credentials += Credentials(Path.userHome / "software" / "aws" / "keys" / "sbt_s3_keys")
+
+S3.progress in S3.upload := true

@@ -13,31 +13,21 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 */
-
 package org.megam.akka
-
-import com.typesafe.config.ConfigFactory
-
 
 /**
  * @author ram
- * 
- * see akka.extn (Settings). Read the akka.extn doc, to the see the approach to be used to pull
- * config value.
+ *
  */
-object Config {
-  
-  /**
-   * Load the AMQP settings
-   */
-  val AMQP_URIS = ConfigFactory.load().getString("amqp.host")
-  val AMQP_MAIN_QUEUE = ConfigFactory.load().getString("amqp.global.queue")
-  val AMQP_MAIN_EXCHANGEE = ConfigFactory.load().getString("amqp.global.exchange")
-  val ZOO_URIS = ConfigFactory.load().getString("amqp.host")
-  val TotalWorker = ConfigFactory.load().getInt("app.worker.totalworkers")
-  /**
-   * Load the zk settings
-   */
-  
+object Constants {
+
+  val MEGAMCLOUD_CLUSTER = "megamcloudcluster"
+  val MEGAMGULP = "megamgulp"
+  val CLOSERVICE = "closervice"
+  val CLOMASTER = "clomaster"
+  val NODEACTOR = "nodeactor"
+  val GULPACTOR = "gulpactor"
+  val GULPMASTER = "gulpmaster"
+  val WATCHACTOR = "watchactor"
 
 }

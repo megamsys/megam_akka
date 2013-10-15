@@ -26,14 +26,16 @@ import akka.actor.Props
  */
 abstract class AbstractSlave(masterLocation: ActorPath)
   extends Actor with ActorLogging {
-  
+
   import org.megam.akka.master.MasterWorkerProtocol._
 
   // We need to know where the master is   
-  val master =  context.actorSelection(masterLocation)
+  val master = context.actorSelection(masterLocation)
 
-  // This is how our derivations will interact with us.  It
-  // allows dervations to complete work asynchronously
+  /**
+   * This is how our derivations will interact with us.  It
+   * allows dervations to complete work asynchronously
+   */
   case class WorkComplete(result: Any)
 
   // Required to be implemented
@@ -42,20 +44,20 @@ abstract class AbstractSlave(masterLocation: ActorPath)
   // Notify the Master that we're alive
   override def preStart() = master ! WorkerCreated(self)
 
-  // This is the state we're in when we're working on something.
-  // In this state we can deal with messages in a much more
-  // reasonable manner
+  /**
+   * This is the state we're in when we're working on something.
+   * In this state we can deal with messages in a much more reasonable manner
+   */
   def working(work: Any): Receive = {
     // Pass... we're already working
-    case WorkIsReady    =>
+    case WorkIsReady     =>
     // Pass... we're already working
-    case NoWorkToBeDone =>
+    case NoWorkToBeDone  =>
     // Pass... we shouldn't even get this
-    case WorkToBeDone(_) =>
-      log.error("Yikes. Master told me to do work, while I'm working.")
+    case WorkToBeDone(_) => log.info("[{}]: >>  {} --> {}", "AbstractSlave", "WorkToBeDone: Yikes. I'm working Master. ", "Can't you see it ?")
     // Our derivation has completed its task
     case WorkComplete(result) =>
-      log.info("Work is complete.  Result {}.", result)
+      log.info("[{}]: >>  {} --> {}", "AbstractSlave", "WorkComplete", result)
       master ! WorkIsDone(self)
       master ! WorkerRequestsWork(self)
       // We're idle now
@@ -68,11 +70,11 @@ abstract class AbstractSlave(masterLocation: ActorPath)
   def idle: Receive = {
     // Master says there's work to be done, let's ask for it
     case WorkIsReady =>
-      log.info("Requesting work")
+      log.info("[{}]: >>  {} --> {}", "AbstractSlave:"+ masterLocation.name, "WorkIsReady", "Howdy is there work ?")
       master ! WorkerRequestsWork(self)
     // Send the work off to the implementation
     case WorkToBeDone(work) =>
-      log.info("Got work {}", work)      
+      log.info("[{}]: >>  {} --> {}", "AbstractSlave:"+masterLocation.name, "WorkToBeDone", "Hey Got Work.")
       doWork(sender, work)
       context.become(working(work))
     // We asked for it, but either someone else got it first, or

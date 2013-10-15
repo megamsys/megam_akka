@@ -42,7 +42,7 @@ class NodeInstanceActor extends Actor with ActorLogging {
   val jobCounter: AtomicInteger = new AtomicInteger(0)
   log.info("==================================NodeInstanceActor Started========================================")
   val settings = Settings(context.system)
-  val findMe = "|^^^/@\"^^^|"
+  val findMe = "|\"|"
 
   override def preStart(): Unit = {
     log.debug("{} Starting ========={}", findMe, "NodeInstanceActor....")

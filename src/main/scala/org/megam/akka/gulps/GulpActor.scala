@@ -18,25 +18,29 @@ package org.megam.akka.gulps
 import scalaz._
 import Scalaz._
 import scalaz.Validation._
+import scala.concurrent._
+import scala.concurrent.duration.Duration
+import org.megam.akka.extn.Settings
+import org.megam.akka.extn.Settings
+import org.megam.akka.gulps.GulpProtocol._
+import org.megam.common._
+import org.megam.common.amqp._
+import org.megam.common.amqp.request._
+import org.megam.common.amqp.response._
+import org.megam.common.concurrent._
+import akka.cluster.Cluster
+import akka.cluster.ClusterEvent._
 import akka.actor.ActorLogging
 import akka.actor.Actor
 import akka.actor.Terminated
 import akka.actor.ActorRef
 import scala.collection.IndexedSeq
+import scala.io.Source
 import java.util.concurrent.atomic.AtomicInteger
-import org.megam.akka.gulps.GulpProtocol._
-import akka.cluster.Cluster
-import akka.cluster.ClusterEvent._
-import java.util.concurrent.atomic.AtomicInteger
-import org.megam.common.amqp._
+import java.io.File
 import net.liftweb.json._
 import net.liftweb.json.scalaz.JsonScalaz._
-import org.megam.akka.extn.Settings
-import scala.io.Source
-import java.io.File
-import org.megam.common._
 import com.twitter.zk._
-import com.twitter.logging.Logger
 /**
  * @author ram
  *
@@ -46,21 +50,15 @@ case class Queue_info(name: String, exchange: String, queue: String)
 class GulpActor extends Actor with ActorLogging {
 
   import org.megam.akka.gulps.GulpProtocol._
-  
+
   implicit val formats = DefaultFormats
 
   val cluster = Cluster(context.system)
-  
-   // This a var. Too bad. Fix it later.
-  var masters = IndexedSeq.empty[ActorRef]
-  
-  //var jobCounter = 0
   val jobCounter: AtomicInteger = new AtomicInteger(0)
-
-  println("====================Gulp Actor Started====================")
+  // This a var. Too bad. Fix it later.
+  var masters = IndexedSeq.empty[ActorRef]
 
   val settings = Settings(context.system)
-  val str1 = new java.io.File("/home/rajthilak/.megam/").listFiles.filter(_.getName.endsWith(".json"))
   val uris = settings.AMQPUri
   val exchange_name = settings.exchange
   val queue_name = settings.queue
@@ -68,12 +66,14 @@ class GulpActor extends Actor with ActorLogging {
   val findMe = "|^^^/@\"^^^|"
 
   override def preStart(): Unit = {
-    log.debug("{} Starting {}", findMe, "GulpService....")
-    str1.map(a => {
+    log.debug(("%-20s -->[%s]").format("GulpActor", "preStart:Entry"))
+    val nodeBootPath = scala.util.Properties.envOrElse("MEGAM_HOME", scala.util.Properties.userHome)
+    val nodeJsons = new java.io.File(nodeBootPath).listFiles.filter(_.getName.endsWith(".json"))
+    nodeJsons.map(a => {
       val lines = Source.fromFile(a)
       val data = parse(lines mkString).extract[Queue_info]
-      val rmq = new RabbitMQClient(uris, data.exchange, data.queue)       
-      execute(rmq.subscribe(quenchThirst, routingKey))
+      val rmq = new RabbitMQClient(uris, data.exchange, data.queue)
+      execute(rmq.subscribe(qThirst, routingKey))
     })
   }
 
@@ -81,9 +81,10 @@ class GulpActor extends Actor with ActorLogging {
     log.debug("{} Stopping {} App. Not implemented yet.", findMe, "GulpService....")
   }
 
-  protected def execute[T](t: AMQPRequest, expectedCode: AMQPResponseCode = AMQPResponseCode.Ok) = {
-    log.debug("{} Execute AMQP SUB {}.", findMe, "GulpService....")
-    val r = t.executeUnsafe
+  protected def execute(ampq_request: AMQPRequest, duration: Duration = org.megam.common.concurrent.duration) = {
+    import org.megam.common.concurrent.SequentialExecutionContext
+    val responseFuture: Future[ValidationNel[Throwable, AMQPResponse]] = ampq_request.apply
+    responseFuture.block(duration)
   }
 
   def receive = {
@@ -91,7 +92,7 @@ class GulpActor extends Actor with ActorLogging {
       println("Service unavailable, try again later----" + job)
       sender ! JobFailed("Service unavailable, try again later", job)
     }
-    case job: GulpJob => {     
+    case job: GulpJob => {
       log.debug("master size---->" + job)
       //masters(jobCounter % masters.size) forward job
       masters(jobCounter.getAndIncrement() % masters.size) forward job
@@ -108,21 +109,20 @@ class GulpActor extends Actor with ActorLogging {
   /**
    * This is a callback function invoked when an consumer thirsty for a response wants it to be quenched.
    * The response is a either a success or  a failure delivered as scalaz (ValidationNel).
-   * See if a message "GulpJob with the result JSON" can be sent to the sender (The sender in this case shall
-   * be GulpActor"
    */
-  def quenchThirst(h: AMQPResponse) = {
+  def qThirst(h: AMQPResponse) = {
     log.info("{} Quench.{}", findMe, "GulpService")
-    val result = h.toJson(false) // the response is parsed back       
-    self ! new GulpJob(result)
-    val res: ValidationNel[Error, String] = result match {
-      case respJSON => {
-        log.info("{} Quench.{}", findMe, "Successs ....")
-        respJSON.successNel
+    val result = h.toJson(false).some // the response is parsed back       
+    val res: ValidationNel[Throwable, Option[String]] = result match {
+      case Some(resp) => {
+        log.info("{} Quench.{}", findMe, "Successs ...." + resp)
+        self ! new GulpJob(result.getOrElse("none-gulpres"))
+        result.successNel
       }
-      case _ => UncategorizedError("request type", "unsupported response type", List()).failNel
+      case None => new java.lang.Error("I received nothing in the amqp response for my subscription, contains invalid JSON. counldn't parse it.").failNel
     }
     res
   }
+
 }
 

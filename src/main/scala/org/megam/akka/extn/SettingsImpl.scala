@@ -35,6 +35,7 @@ class SettingsImpl(config: Config) extends Extension {
  
   val ZooUri: String = config.getString("app.zoo.uris")
   
+  //val TotalWorker: Int = config.getInt("app.worker.totalworkers")
   
 }
 
