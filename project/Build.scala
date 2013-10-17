@@ -22,10 +22,11 @@ import akka.sbt.AkkaKernelPlugin
 import akka.sbt.AkkaKernelPlugin.{ Dist, outputDirectory, distJvmOptions, additionalLibs }
 
 object MegamAkkaKernel extends Build {
-
+  
   val Organization = "org.megam"
-  val Version = "0.1.0-SNAPSHOT"
-  val ScalaVersion = "2.10.2"
+  val Version = "0.1.0"
+  val ScalaVersion = "2.10.3"
+  val Description = "Cloud bridge to cloud manage megam platform."
 
   lazy val megamAkka = Project(
     id = "megam_akka",
@@ -35,13 +36,14 @@ object MegamAkkaKernel extends Build {
       resolvers := HerkResolvers.All,
       distJvmOptions in Dist := "-Xms256M -Xmx512M",
       additionalLibs in Dist := Seq(new java.io.File("lib/libsigar-amd64-linux-1.6.4.so")),
-      outputDirectory in Dist := file("target/megam_akka")))
+      outputDirectory in Dist := file("target/megam_herk")))
 
   lazy val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := Organization,
     version := Version,
     scalaVersion := ScalaVersion,
     crossPaths := false,
+    description := Description,
     organizationName := "Megam Systems.",
     organizationHomepage := Some(url("http://www.megam.co")))
 
