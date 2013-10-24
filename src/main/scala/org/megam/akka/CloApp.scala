@@ -30,6 +30,7 @@ import org.megam.akka.slave._
 import org.megam.akka.master._
 import com.typesafe.config.ConfigFactory
 import org.megam.akka.extn.Settings
+import org.megam.akka.Config._
 /**
  * @author ram
  *
@@ -44,9 +45,8 @@ import org.megam.akka.extn.Settings
 class CloApp extends Bootable {
 
   val system = ActorSystem(MEGAMCLOUD_CLUSTER)
-
   var clo_clusters = Set.empty[Address]
-  val s = system.settings
+  val s = system.settings  
   val t_workers = org.megam.akka.Config.TotalWorker
   
   def startup = {
@@ -72,7 +72,8 @@ class CloApp extends Bootable {
     system.actorOf(Props[CloMaster], name = CLOMASTER)
 
     //TO-DO: Create <x> workers, use a "configurable flag (clo.workers=10) in the settings file" 
-    val clo_workers = 1 to t_workers map { x => worker(CLOMASTER) }
+    //println("[MEGAM]: >> Clo Workers -----------------------------> %d", t_workers)
+    val clo_workers = 1 to 10 map { x => worker(CLOMASTER) }
     println("[MEGAM]: >> Clo Workers --> created")
 
   }
