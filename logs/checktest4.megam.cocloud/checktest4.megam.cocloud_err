@@ -1,0 +1,21 @@
+stty: standard input: Inappropriate ioctl for device
+stty: standard input: Inappropriate ioctl for device
+stty: standard input: Inappropriate ioctl for device
+stty: standard input: Inappropriate ioctl for device
+stty: standard input: Inappropriate ioctl for device
+stty: standard input: Inappropriate ioctl for device
+stty: standard input: Inappropriate ioctl for device
+stty: standard input: Inappropriate ioctl for device
+stty: standard input: Inappropriate ioctl for device
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1
+ERROR: Fog::Compute::AWS::Error: InstanceLimitExceeded => Your quota allows for 0 more running instance(s). You requested at least 1

@@ -52,8 +52,7 @@ class GulpSlave(masterLocation: ActorPath) extends AbstractSlave(masterLocation)
   log.info("Gulp Slave started")
 
   def doWork(workSender: ActorRef, msg: Any): Unit = {
-    Future {
-      workSender ! msg
+    Future {     
       msg match {
         case GulpJob(x) => {
           val str1 = new java.io.File("/home/rajthilak/.megam/").listFiles.filter(_.getName.endsWith(".json"))

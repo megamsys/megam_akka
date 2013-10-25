@@ -67,6 +67,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
     msg match {
       case CloJob(x) => {
         val json = parse(x)
+        log.info("[{}]: >>  {} --> {}", "Slave", "jsonvalue", json)
         val m = json.extract[MessageJson]
         val n = (parse(m.body)).extract[BodyJson]
         val mm = n.message
@@ -82,8 +83,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   }
 
   def doWork(workSender: ActorRef, msg: Any): Unit = {
-    Future {
-      workSender ! msg
+    Future {     
       msg match {
         case CloJob(x) => {
           //TO-DO: separate it into individual computation of monads.
@@ -103,8 +103,9 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         }
         case NodeJob(x) => {
           log.info("[{}]: >>  {} --> {}", "Slave", "NodeJob", x)
-          val zoo = new Zoo(uris, "nodes")
-          zoo.create(x, "Request ID started")
+          log.info("[{}]: >>  {} --> {}", "Slave", "URIS for ZooKeeper", uris)
+          val zoo = new Zoo(uris, "nodes")         
+          zoo.create(x, "Request ID started")          
         }
       }
       WorkComplete("done")

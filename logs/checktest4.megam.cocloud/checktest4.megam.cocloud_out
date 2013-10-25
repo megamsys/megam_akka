@@ -1,0 +1,64 @@
+Instance ID: i-2276c274
+Flavor: t1.micro
+Image: ami-2b511e79
+Region: ap-southeast-1
+Availability Zone: ap-southeast-1a
+Security Groups: megam
+Tags: {"Name"=>"checktest4.megam.co"}
+SSH Key: megam_ec2
+
+Waiting for instance.........
+Public DNS Name: ec2-54-254-54-155.ap-southeast-1.compute.amazonaws.com
+Public IP Address: 54.254.54.155
+Private DNS Name: ip-10-130-185-204.ap-southeast-1.compute.internal
+Private IP Address: 10.130.185.204
+
+Waiting for sshd..done
+Bootstrapping Chef on ec2-54-254-54-155.ap-southeast-1.compute.amazonaws.com
+Failed to authenticate ubuntu - trying password auth
+Enter your password: Instance ID: i-ec066bba
+Flavor: t1.micro
+Image: ami-2b511e79
+Region: ap-southeast-1
+Availability Zone: ap-southeast-1a
+Security Groups: megam
+Tags: {"Name"=>"checktest4.megam.co"}
+SSH Key: megam_ec2
+
+Waiting for instance.........
+Public DNS Name: ec2-54-251-21-238.ap-southeast-1.compute.amazonaws.com
+Public IP Address: 54.251.21.238
+Private DNS Name: ip-10-130-77-195.ap-southeast-1.compute.internal
+Private IP Address: 10.130.77.195
+
+Waiting for sshd..done
+Bootstrapping Chef on ec2-54-251-21-238.ap-southeast-1.compute.amazonaws.com
+Failed to authenticate ubuntu - trying password auth
+Enter your password: Instance ID: i-bdd74eeb
+Flavor: t1.micro
+Image: ami-2b511e79
+Region: ap-southeast-1
+Availability Zone: ap-southeast-1a
+Security Groups: megam
+Tags: {"Name"=>"checktest4.megam.co"}
+SSH Key: megam_ec2
+
+Waiting for instance......Instance ID: i-612c4237
+Flavor: t1.micro
+Image: ami-2b511e79
+Region: ap-southeast-1
+Availability Zone: ap-southeast-1a
+Security Groups: megam
+Tags: {"Name"=>"checktest4.megam.co"}
+SSH Key: megam_ec2
+
+Waiting for instance........
+Public DNS Name: ec2-122-248-214-196.ap-southeast-1.compute.amazonaws.com
+Public IP Address: 122.248.214.196
+Private DNS Name: ip-10-136-79-144.ap-southeast-1.compute.internal
+Private IP Address: 10.136.79.144
+
+Waiting for sshd..done
+Bootstrapping Chef on ec2-122-248-214-196.ap-southeast-1.compute.amazonaws.com
+Failed to authenticate ubuntu - trying password auth
+Enter your password: 

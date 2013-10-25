@@ -35,7 +35,7 @@ class SettingsImpl(config: Config) extends Extension {
  
   val ZooUri: String = config.getString("app.zoo.uris")
   
- val TotalWorker: Int = config.getInt("app.worker.totalworkers")
+  //val TotalWorker: Int = config.getInt("app.worker.totalworkers")
   
 }
 
@@ -43,6 +43,11 @@ object Settings extends ExtensionId[SettingsImpl] with ExtensionIdProvider {
   
   override def lookup = Settings
   
-  override def createExtension(system: ExtendedActorSystem) = new SettingsImpl(system.settings.config)
+  override def createExtension(system: ExtendedActorSystem) = new SettingsImpl(system.settings.config) 
+  
   
 }
+
+
+
+

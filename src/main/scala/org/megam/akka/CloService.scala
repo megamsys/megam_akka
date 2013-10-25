@@ -59,7 +59,7 @@ class CloService extends Actor with ActorLogging {
 
   override def preStart(): Unit = {
     println("CloService preStart Entry")
-    log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "preStart", "Entry")  
+    log.info("[{}]: >>  {} --> {}", "CloService", findMe + "preStart", "Entry")  
     val rmq = new RabbitMQClient(uris, exchange_name, queue_name)
     execute(rmq.subscribe(qThirst, routingKey))
     println("CloService prestart Exit")
@@ -67,7 +67,7 @@ class CloService extends Actor with ActorLogging {
   }
 
   override def postStop(): Unit = {
-    log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "postStop", "TO-DO: Not implemented yet.")
+    log.info("[{}]: >>  {} --> {}", "CloService", findMe + "postStop", "TO-DO: Not implemented yet.")
   }
 
   protected def execute(ampq_request: AMQPRequest, duration: Duration = org.megam.common.concurrent.duration) = {
@@ -86,7 +86,7 @@ class CloService extends Actor with ActorLogging {
       sender ! CloFail("Service unavailable, try again later" + clomasters.size, job)
 
     case job: CloJob => {
-      log.debug("{} CloJob Forwarded.{}", findMe, job)
+      log.info("{} CloJob Forwarded.{}", findMe, job)
       clomasters(jobCounter.getAndIncrement() % clomasters.size) forward job
     }
     case result: CloRes  => println(result)
@@ -94,10 +94,10 @@ class CloService extends Actor with ActorLogging {
     case CloReg if !clomasters.contains(sender) => {
       context watch sender
       clomasters = clomasters :+ sender
-      log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "CloReg", clomasters.size)
+      log.info("[{}]: >>  {} --> {}", "CloService", findMe + "CloReg", clomasters.size)
     }
     case Terminated(a) => {
-      log.debug("[{}]: >>  {} --> {}", "CloService", findMe + "Terminated", clomasters.size)
+      log.info("[{}]: >>  {} --> {}", "CloService", findMe + "Terminated", clomasters.size)
       clomasters = clomasters.filterNot(_ == a)
     }
 
