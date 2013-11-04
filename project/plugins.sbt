@@ -3,8 +3,8 @@ resolvers += Resolver.url("Typesafe Snapshots", url("http://repo.typesafe.com/ty
 
 resolvers += Resolver.url("Akka Snapshots", url("http://repo.akka.io/snapshots/"))
 
-addSbtPlugin("com.typesafe.akka" % "akka-sbt-plugin" % "2.2.1")
+addSbtPlugin("com.typesafe.akka" % "akka-sbt-plugin" % "2.2.3")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.6.2")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.6.3")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-s3" % "0.5")
