@@ -14,6 +14,7 @@ scalacOptions := Seq(
 	"-unchecked", 
 	"-deprecation",
 	"-feature",
+	"-optimise",
   	"-Xcheckinit",
   	"-Xlint",
   	"-Xverify",
