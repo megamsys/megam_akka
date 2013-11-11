@@ -86,15 +86,13 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
 }
 
-mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", sbt.Keys.version)),"debs/megam_herk.deb"))
+mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.1.0")),"debs/megam_herk.deb"))
 
 host in upload := "megampub.s3.amazonaws.com"
 
-mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", sbt.Keys.version)),"debs/megam_herk.deb"))
+mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.1.0")),"debs/megam_herk.deb"))
 
 host in download := "megampub.s3.amazonaws.com"
-
-mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", sbt.Keys.version)),"debs/megam_herk.deb"))
 
 host in delete := "megampub.s3.amazonaws.com"
 
