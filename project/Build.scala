@@ -94,6 +94,6 @@ object Dependency {
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
   val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
-  val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg
+  val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg_SNST
   val mc = "com.github.indykish" % "megam_chef" % V.Mg_SNST
 }
