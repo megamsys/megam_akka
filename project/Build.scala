@@ -22,7 +22,7 @@ import akka.sbt.AkkaKernelPlugin
 import akka.sbt.AkkaKernelPlugin.{ Dist, outputDirectory, distJvmOptions, additionalLibs }
 
 object MegamAkkaKernel extends Build {
-  
+
   val Organization = "org.megam"
   val Version = "0.1.0"
   val ScalaVersion = "2.10.3"
@@ -66,10 +66,10 @@ object MegamAkkaKernel extends Build {
 object HerkResolvers {
   val akkasp = "Akka Snapshots Repo" at "http://repo.akka.io/snapshots"
   val typesp = "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots"
-  val sonasp = "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+  val sonasp = "Sonatype Snapshots" at Opts.resolver.sonatypeSnapshots.root
+  val sonarl = "Sonatype Releases" at Opts.resolver.sonatypeStaging.root
   val scatsp = "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
-
-  val All = Seq(akkasp, typesp, sonasp, scatsp)
+  val All = Seq(akkasp, typesp, sonasp, sonarl, scatsp)
 }
 
 object Dependencies {
@@ -83,7 +83,9 @@ object Dependency {
   // Versions
   object V {
     val Akka = "2.2.3"
-    val Mg = "0.1.0-SNAPSHOT"
+    val Mg = "0.1.0"
+    val Mg_SNST = "0.1.0-SNAPSHOT"
+
   }
   val snowflake = "com.twitter.service" % "snowflake" % "1.0.2" from "https://s3-ap-southeast-1.amazonaws.com/megampub/0.1/jars/snowflake.jar"
   val akkaKernel = "com.typesafe.akka" %% "akka-kernel" % V.Akka
@@ -93,5 +95,5 @@ object Dependency {
   val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
   val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg
-  val mc = "com.github.indykish" % "megam_chef" % V.Mg
+  val mc = "com.github.indykish" % "megam_chef" % V.Mg_SNST
 }
