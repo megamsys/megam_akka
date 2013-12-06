@@ -70,8 +70,9 @@ class CloApp extends Bootable {
     system.actorOf(Props[CloService], name = CLOSERVICE)
     //TO-DO: Why do we need a NodeActor here ? Hmm.. may be everything is a node ?
     system.actorOf(Props[NodeInstanceActor], name = NODEACTOR)
+    system.actorOf(Props[CloudRecipeActor], name = CLOUDRECIPEACTOR)
     system.actorOf(Props[CloMaster], name = CLOMASTER)
-
+    
     //TO-DO: Create <x> workers, use a "configurable flag (clo.workers=10) in the settings file" 
     //println("[MEGAM]: >> Clo Workers -----------------------------> %d", system)
     val clo_workers = 1 to 10 map { x => worker(CLOMASTER) }

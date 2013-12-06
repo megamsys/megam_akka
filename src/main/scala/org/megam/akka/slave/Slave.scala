@@ -78,6 +78,12 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         val m = json.extract[MessageJson]
         m.body
       }
+      case RecipeJob(x) => {
+        val json = parse(x)
+        log.info("[{}]: >>  {} --> {}", "Slave", "jsonvalue", json)
+        val m = json.extract[MessageJson]        
+        m.body
+      }
       case None => ""
     }
   }
@@ -106,6 +112,11 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
           log.info("[{}]: >>  {} --> {}", "Slave", "URIS for ZooKeeper", uris)
           val zoo = new Zoo(uris, "nodes")         
           zoo.create(x, "Request ID started")          
+        }
+        case RecipeJob(x) => {
+          log.info("[{}]: >>  {} --> {}", "Slave", "RecipeJob", x)
+          val json = jsonValue(msg)
+          log.info("[{}]: >>  {} --------> {}", "Slave", "RecipeJob", json)
         }
       }
       WorkComplete("done")

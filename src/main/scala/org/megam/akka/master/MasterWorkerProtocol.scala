@@ -43,4 +43,9 @@ object MasterWorkerProtocol {
   case class WatchRes(res: String)
   case class WatchFail(fail: String, job: WatchJob)
 
+  case object RecipeReg
+  case class RecipeJob(job: String)
+  case class RecipeRes(res: String)
+  case class RecipeFail(fail: String, job: RecipeJob)
+
 }

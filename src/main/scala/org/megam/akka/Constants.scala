@@ -29,5 +29,5 @@ object Constants {
   val GULPACTOR = "gulpactor"
   val GULPMASTER = "gulpmaster"
   val WATCHACTOR = "watchactor"
-
+  val CLOUDRECIPEACTOR ="cloudrecipeactor"
 }

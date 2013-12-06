@@ -35,6 +35,10 @@ class SettingsImpl(config: Config) extends Extension {
  
   val ZooUri: String = config.getString("app.zoo.uris")
   
+  val recipe_queue = config.getString("app.amqp.recipe_queue")
+  
+  val recipe_exchange: String = config.getString("app.amqp.recipe_exchange")
+  
   //val TotalWorker: Int = config.getInt("app.worker.totalworkers")
   
 }
