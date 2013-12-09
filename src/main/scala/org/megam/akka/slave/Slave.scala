@@ -36,6 +36,9 @@ import com.twitter.util.{ Duration, Promise, TimeoutException, Timer, Return, Aw
 import org.apache.zookeeper.data.{ ACL, Stat }
 import org.apache.zookeeper.KeeperException
 import org.megam.akka.master.MasterWorkerProtocol._
+
+
+
 /**
  * @author ram
  *
@@ -81,8 +84,10 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
       case RecipeJob(x) => {
         val json = parse(x)
         log.info("[{}]: >>  {} --> {}", "Slave", "jsonvalue", json)
-        val m = json.extract[MessageJson]        
-        m.body
+        val m = json.extract[MessageJson]
+        val n = (parse(m.body)).extract[BodyJson]
+        val mm = n.message
+        mm
       }
       case None => ""
     }
@@ -116,7 +121,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         case RecipeJob(x) => {
           log.info("[{}]: >>  {} --> {}", "Slave", "RecipeJob", x)
           val json = jsonValue(msg)
-          log.info("[{}]: >>  {} --------> {}", "Slave", "RecipeJob", json)
+          log.info("[{}]: >>  {} --------> {}", "Slave", "RecipeJob", json)         
         }
       }
       WorkComplete("done")

@@ -42,6 +42,7 @@ class CloMaster extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
   val cloName = CLOSERVICE
   val nodeName = NODEACTOR
+  val repName = CLOUDRECIPEACTOR
   // Holds known workers and what they may be working on
   val workers = Map.empty[ActorRef, Option[Tuple2[ActorRef, Any]]]
 
@@ -50,6 +51,7 @@ class CloMaster extends Actor with ActorLogging {
   val workQ = Queue.empty[Tuple2[ActorRef, Any]]
   val cloIdentifyId = 1
   val nodeIdentifyId = 2
+  val repIdentifyId = 3
   /** Notifies workers that there's work available, provided they're
    * not already working on something */
   def notifyWorkers(): Unit = {
@@ -74,6 +76,7 @@ class CloMaster extends Actor with ActorLogging {
      */
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, cloName))) ! Identify(cloIdentifyId)
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, nodeName))) ! Identify(nodeIdentifyId)
+    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, repName))) ! Identify(repIdentifyId)
     log.info("[{}]: >>  {} --> {}", "CloMaster", "preStart", "Exit")
 
   }
@@ -88,6 +91,9 @@ class CloMaster extends Actor with ActorLogging {
 
     case ActorIdentity(`nodeIdentifyId`, Some(ref)) ⇒
       ref ! NodeReg
+      
+    case ActorIdentity(`repIdentifyId`, Some(ref)) ⇒
+      ref ! RecipeReg
     /* Worker is alive. Add him to the list, watch him for
      * death, and let him know if there's work to be done */
     case WorkerCreated(worker) =>
