@@ -31,13 +31,13 @@ import org.megam.chef.exception._
 import org.megam.akka.Constants._
 import org.megam.akka.extn.Settings
 import org.megam.common._
+import org.megam.common.s3._
+import org.megam.common.s3.S3
 import com.twitter.zk._
 import com.twitter.util.{ Duration, Promise, TimeoutException, Timer, Return, Await }
 import org.apache.zookeeper.data.{ ACL, Stat }
 import org.apache.zookeeper.KeeperException
 import org.megam.akka.master.MasterWorkerProtocol._
-
-
 
 /**
  * @author ram
@@ -59,13 +59,12 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   // You can use whatever you want.
   implicit val ec = context.dispatcher
   implicit val formats = DefaultFormats
- 
-  log.info("[{}]: >>  {} --> {}", "Slave:"+masterLocation.name, "Started", "Entry")
+
+  log.info("[{}]: >>  {} --> {}", "Slave:" + masterLocation.name, "Started", "Entry")
 
   val settings = Settings(context.system)
   val uris = settings.ZooUri
 
-  
   def jsonValue(msg: Any): String = {
     msg match {
       case CloJob(x) => {
@@ -94,7 +93,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   }
 
   def doWork(workSender: ActorRef, msg: Any): Unit = {
-    Future {     
+    Future {
       msg match {
         case CloJob(x) => {
           //TO-DO: separate it into individual computation of monads.
@@ -108,20 +107,25 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
             t.printStackTrace(new java.io.PrintWriter(u))
             log.error("[{}]: >>  {} --> {}", "Slave-" + id, "Future:Failure", u.toString)
             t
-          } flatMap { x => 
+          } flatMap { x =>
             (context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, NODEACTOR))) ! new NodeJob(id)).successNel
           }
         }
         case NodeJob(x) => {
           log.info("[{}]: >>  {} --> {}", "Slave", "NodeJob", x)
           log.info("[{}]: >>  {} --> {}", "Slave", "URIS for ZooKeeper", uris)
-          val zoo = new Zoo(uris, "nodes")         
-          zoo.create(x, "Request ID started")          
+          val zoo = new Zoo(uris, "nodes")
+          zoo.create(x, "Request ID started")
         }
         case RecipeJob(x) => {
           log.info("[{}]: >>  {} --> {}", "Slave", "RecipeJob", x)
-          val json = jsonValue(msg)
-          log.info("[{}]: >>  {} --------> {}", "Slave", "RecipeJob", json)         
+          val vl = jsonValue(msg)
+          log.info("[{}]: >>  {} --------> {}", "Slave", "RecipeJob", vl)
+          Validation.fromTryCatch {
+            val s3 = new S3(Tuple2("accesskey", "secretkey"), "s3-ap-southeast-1.amazonaws.com")
+            s3.download("cloudrecipesss", vl)
+            (new ZipArchive).unZip("cloudrecipes/sandy@megamsandbox.com/chef/chef-repo.zip", "cloudrecipes/sandy@megamsandbox.com/chef/")
+          } leftMap { t: Throwable => t }
         }
       }
       WorkComplete("done")
