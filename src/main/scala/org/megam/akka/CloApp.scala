@@ -44,12 +44,11 @@ import org.megam.akka.Config._
  *  GulpActor is the node actor which is started as a result of creation of a cloud_book from the interface (UI, CLI, Mob)
  */
 class CloApp extends Bootable {
-   val config = ConfigFactory.load()
+
+  val config = ConfigFactory.load()
   val system = ActorSystem(MEGAMCLOUD_CLUSTER)
   var clo_clusters = Set.empty[Address]
-  //val settings = Settings(context.system)
-  //val t_workers = org.megam.akka.Config.TotalWorker
-  
+
   def startup = {
     println("[MEGAM]: >> Booting up Megam --> Cloud Bridge 0.1")
     val clusterListener = system.actorOf(Props(new Actor with ActorLogging {
@@ -68,14 +67,11 @@ class CloApp extends Bootable {
 
     //Every cluster[megamcloud_cluster] starts with a closervice and master=><x number of workers>     
     system.actorOf(Props[CloService], name = CLOSERVICE)
-    //TO-DO: Why do we need a NodeActor here ? Hmm.. may be everything is a node ?
-    system.actorOf(Props[NodeInstanceActor], name = NODEACTOR)
     system.actorOf(Props[CloudRecipeActor], name = CLOUDRECIPEACTOR)
     system.actorOf(Props[CloMaster], name = CLOMASTER)
-    
-    //TO-DO: Create <x> workers, use a "configurable flag (clo.workers=10) in the settings file" 
-    //println("[MEGAM]: >> Clo Workers -----------------------------> %d", system)
-    val clo_workers = 1 to 10 map { x => worker(CLOMASTER) }
+
+    println("[MEGAM]: >> Clo Workers -----------------------------> %d")
+    val clo_workers = 1 to WORKER_COUNT map { x => worker(CLOMASTER) }
     println("[MEGAM]: >> Clo Workers --> created")
 
   }
