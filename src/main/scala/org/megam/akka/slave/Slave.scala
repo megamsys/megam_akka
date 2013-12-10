@@ -17,9 +17,7 @@ package org.megam.akka.slave
 
 import scalaz._
 import Scalaz._
-import akka.actor.Actor
-import akka.actor.ActorPath
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorPath, ActorRef}
 import akka.pattern.pipe
 import scala.concurrent.Future
 import org.megam.akka.CloProtocol._
@@ -32,7 +30,6 @@ import org.megam.akka.Constants._
 import org.megam.akka.extn.Settings
 import org.megam.common._
 import org.megam.common.s3._
-import org.megam.common.s3.S3
 import com.twitter.zk._
 import com.twitter.util.{ Duration, Promise, TimeoutException, Timer, Return, Await }
 import org.apache.zookeeper.data.{ ACL, Stat }
