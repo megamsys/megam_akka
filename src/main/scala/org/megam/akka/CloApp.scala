@@ -66,7 +66,7 @@ class CloApp extends Bootable {
     Cluster(system).subscribe(clusterListener, classOf[ClusterDomainEvent])
 
     //Every cluster[megamcloud_cluster] starts with a closervice and master=><x number of workers>     
-    system.actorOf(Props[CloService], name = CLOSERVICE)
+    system.actorOf(Props[CloService], name = CLOSERVICE)    
     system.actorOf(Props[CloudRecipeActor], name = CLOUDRECIPEACTOR)
     system.actorOf(Props[CloMaster], name = CLOMASTER)
 

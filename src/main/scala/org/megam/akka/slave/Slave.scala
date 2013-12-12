@@ -17,7 +17,7 @@ package org.megam.akka.slave
 
 import scalaz._
 import Scalaz._
-import akka.actor.{Actor, ActorPath, ActorRef}
+import akka.actor.{ Actor, ActorPath, ActorRef }
 import akka.pattern.pipe
 import scala.concurrent.Future
 import org.megam.akka.CloProtocol._
@@ -35,7 +35,7 @@ import com.twitter.util.{ Duration, Promise, TimeoutException, Timer, Return, Aw
 import org.apache.zookeeper.data.{ ACL, Stat }
 import org.apache.zookeeper.KeeperException
 import org.megam.akka.master.MasterWorkerProtocol._
-
+import java.net.URI
 /**
  * @author ram
  *
@@ -61,7 +61,11 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
 
   val settings = Settings(context.system)
   val uris = settings.ZooUri
-
+  val access_key = settings.access_key
+  val secret_key = settings.secret_key
+  val recipe_bucket = settings.recipe_bucket
+  val aws_region = settings.aws_region
+  
   def jsonValue(msg: Any): String = {
     msg match {
       case CloJob(x) => {
@@ -87,6 +91,17 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
       }
       case None => ""
     }
+  }
+    
+  def vaultLocationParser(url: String) = {
+    var str = url
+    val lst = str.lastIndexOf("/")
+    val file = str.substring(lst)
+    str = str.replace(str.substring(lst), "")
+    val cts = str.substring(str.lastIndexOf("/"))
+    str = str.replace(str.substring(str.lastIndexOf("/")), "")
+    val email = str.substring(str.lastIndexOf("/")+1)   
+    email+cts+file
   }
 
   def doWork(workSender: ActorRef, msg: Any): Unit = {
@@ -115,13 +130,15 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
           zoo.create(x, "Request ID started")
         }
         case RecipeJob(x) => {
-          log.info("[{}]: >>  {} --> {}", "Slave", "RecipeJob", x)
-          val vl = jsonValue(msg)
-          log.info("[{}]: >>  {} --------> {}", "Slave", "RecipeJob", vl)
+          log.info("[{}]: >>  {} --> {}", "Slave", "vault_location", x)
+          val vl = jsonValue(msg)          
           Validation.fromTryCatch {
-            val s3 = new S3(Tuple2("accesskey", "secretkey"), "s3-ap-southeast-1.amazonaws.com")
-            s3.download("cloudrecipesss", vl)
-            (new ZipArchive).unZip("cloudrecipes/sandy@megamsandbox.com/chef/chef-repo.zip", "cloudrecipes/sandy@megamsandbox.com/chef/")
+            val s3 = new S3(Tuple2(access_key, secret_key), aws_region)
+            val loc = vaultLocationParser(vl)
+            log.info("[{}]: >>  {} ------------> {}", "Slave", "Download_location", loc)
+            s3.download(recipe_bucket, loc)    
+            val download_loc =  loc.replace(loc.substring(loc.lastIndexOf("/")), "")
+            (new ZipArchive).unZip(recipe_bucket+"/"+loc, recipe_bucket+"/"+download_loc)
           } leftMap { t: Throwable => t }
         }
       }

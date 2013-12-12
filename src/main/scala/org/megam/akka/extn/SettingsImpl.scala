@@ -39,6 +39,14 @@ class SettingsImpl(config: Config) extends Extension {
   
   val recipe_exchange: String = config.getString("app.amqp.recipe_exchange")
   
+  val access_key = config.getString("app.vault.access_key")
+  
+  val secret_key = config.getString("app.vault.secret_key")
+  
+  val recipe_bucket = config.getString("app.vault.recipe_bucket")
+  
+  val aws_region = config.getString("app.vault.aws_region")
+  
   //val TotalWorker: Int = config.getInt("app.worker.totalworkers")
   
 }

@@ -41,7 +41,7 @@ class CloMaster extends Actor with ActorLogging {
 
   val cluster = Cluster(context.system)
   val cloName = CLOSERVICE
-  val nodeName = NODEACTOR
+  //val nodeName = NODEACTOR
   val repName = CLOUDRECIPEACTOR
   // Holds known workers and what they may be working on
   val workers = Map.empty[ActorRef, Option[Tuple2[ActorRef, Any]]]
@@ -50,11 +50,12 @@ class CloMaster extends Actor with ActorLogging {
    * as the memory of who asked for it */
   val workQ = Queue.empty[Tuple2[ActorRef, Any]]
   val cloIdentifyId = 1
-  val nodeIdentifyId = 2
-  val repIdentifyId = 3
+ // val nodeIdentifyId = 2
+  val repIdentifyId = 2
   /** Notifies workers that there's work available, provided they're
    * not already working on something */
   def notifyWorkers(): Unit = {
+    log.info("[{}]: >>  {} --> {}", "CloMaster", "notifyworkers", "Entry")
     if (!workQ.isEmpty) {
       workers.foreach {
         case (worker, m) if (m.isEmpty) => worker ! WorkIsReady
@@ -75,7 +76,7 @@ class CloMaster extends Actor with ActorLogging {
      * and automatically reply to with a ActorIdentity message containing the ActorRef.
      */
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, cloName))) ! Identify(cloIdentifyId)
-    context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, nodeName))) ! Identify(nodeIdentifyId)
+    //context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, nodeName))) ! Identify(nodeIdentifyId)
     context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, repName))) ! Identify(repIdentifyId)
     log.info("[{}]: >>  {} --> {}", "CloMaster", "preStart", "Exit")
 
@@ -89,8 +90,8 @@ class CloMaster extends Actor with ActorLogging {
     case ActorIdentity(`cloIdentifyId`, Some(ref)) ⇒
       ref ! CloReg
 
-    case ActorIdentity(`nodeIdentifyId`, Some(ref)) ⇒
-      ref ! NodeReg
+   // case ActorIdentity(`nodeIdentifyId`, Some(ref)) ⇒
+     // ref ! NodeReg
       
     case ActorIdentity(`repIdentifyId`, Some(ref)) ⇒
       ref ! RecipeReg
