@@ -47,6 +47,8 @@ class SettingsImpl(config: Config) extends Extension {
   
   val aws_region = config.getString("app.vault.aws_region")
   
+  //val megam_home = config.getString("app.vault.megam_home")
+  
   //val TotalWorker: Int = config.getInt("app.worker.totalworkers")
   
 }

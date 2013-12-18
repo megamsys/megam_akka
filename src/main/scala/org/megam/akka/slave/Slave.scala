@@ -65,6 +65,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   val secret_key = settings.secret_key
   val recipe_bucket = settings.recipe_bucket
   val aws_region = settings.aws_region
+  //val megam_home = settings.megam_home
   
   def jsonValue(msg: Any): String = {
     msg match {
