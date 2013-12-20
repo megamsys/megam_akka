@@ -23,6 +23,7 @@ import scala.concurrent.Future
 import org.megam.akka.CloProtocol._
 import net.liftweb.json._
 import org.megam.chef.ChefServiceRunner
+import org.megam.scm.git.GitRepository
 import org.megam.chef.DropIn
 import org.megam.chef.ProvisionerFactory.TYPE
 import org.megam.chef.exception._
@@ -36,6 +37,7 @@ import org.apache.zookeeper.data.{ ACL, Stat }
 import org.apache.zookeeper.KeeperException
 import org.megam.akka.master.MasterWorkerProtocol._
 import java.net.URI
+import java.io.File;
 /**
  * @author ram
  *
@@ -50,6 +52,7 @@ import java.net.URI
  */
 case class MessageJson(code: Int, body: String, time_received: String)
 case class BodyJson(message: String)
+case class RecipeBodyJson(vault_loc: String, repo_path: String)
 
 class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   // We'll use the current dispatcher for the execution context.
@@ -57,43 +60,43 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   implicit val ec = context.dispatcher
   implicit val formats = DefaultFormats
 
-  log.info("[{}]: >>  {} --> {}", "Slave:" + masterLocation.name, "Started", "Entry")
+  log.info("[{}]: >> {} --> {}", "Slave:" + masterLocation.name, "Started", "Entry")
 
   val settings = Settings(context.system)
   val uris = settings.ZooUri
   val access_key = settings.access_key
   val secret_key = settings.secret_key
-  val recipe_bucket = settings.recipe_bucket
-  val aws_region = settings.aws_region
+  val recipe_bucket = settings.recipe_bucket  
+  val clone_file_name = settings.clone_file_name
   //val megam_home = settings.megam_home
-  
-  def jsonValue(msg: Any): String = {
+
+  def jsonValue(msg: Any): Tuple2[String, String] = {
     msg match {
       case CloJob(x) => {
         val json = parse(x)
-        log.info("[{}]: >>  {} --> {}", "Slave", "jsonvalue", json)
+        log.info("[{}]: >> {} --> {}", "Slave", "jsonvalue", json)
         val m = json.extract[MessageJson]
         val n = (parse(m.body)).extract[BodyJson]
         val mm = n.message
-        mm
+        Tuple2(mm, "")
       }
       case NodeJob(x) => {
         val json = parse(x)
         val m = json.extract[MessageJson]
-        m.body
+        Tuple2(m.body, "")
       }
       case RecipeJob(x) => {
         val json = parse(x)
-        log.info("[{}]: >>  {} --> {}", "Slave", "jsonvalue", json)
+        log.info("[{}]: >> {} --> {}", "Slave", "jsonvalue", json)
         val m = json.extract[MessageJson]
         val n = (parse(m.body)).extract[BodyJson]
-        val mm = n.message
-        mm
+        val l = (parse(n.message)).extract[RecipeBodyJson]
+        Tuple2(l.vault_loc, l.repo_path)
       }
-      case None => ""
+      case None => ("", "")
     }
   }
-    
+
   def vaultLocationParser(url: String) = {
     var str = url
     val lst = str.lastIndexOf("/")
@@ -101,8 +104,8 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
     str = str.replace(str.substring(lst), "")
     val cts = str.substring(str.lastIndexOf("/"))
     str = str.replace(str.substring(str.lastIndexOf("/")), "")
-    val email = str.substring(str.lastIndexOf("/")+1)   
-    email+cts+file
+    val email = str.substring(str.lastIndexOf("/") + 1)
+    email + cts + file
   }
 
   def doWork(workSender: ActorRef, msg: Any): Unit = {
@@ -110,37 +113,48 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
       msg match {
         case CloJob(x) => {
           //TO-DO: separate it into individual computation of monads.
-          log.info("[{}]: >>  {} --> {}", "Slave", "Future", msg)
-          val id = jsonValue(msg)
-          log.info("[{}]: >>  {} --> {}", "Slave", "id", id)
+          log.info("[{}]: >> {} --> {}", "Slave", "Future", msg)
+          val tuple_succ = jsonValue(msg)
+          val id = tuple_succ._1
+          log.info("[{}]: >> {} --> {}", "Slave", "id", id)
           Validation.fromTryCatch {
             (new ChefServiceRunner()).withType(TYPE.CHEF_WITH_SHELL).input(new DropIn(id)).control()
           } leftMap { t: Throwable =>
             val u = new java.io.StringWriter
             t.printStackTrace(new java.io.PrintWriter(u))
-            log.error("[{}]: >>  {} --> {}", "Slave-" + id, "Future:Failure", u.toString)
+            log.error("[{}]: >> {} --> {}", "Slave-" + id, "Future:Failure", u.toString)
             t
           } flatMap { x =>
             (context.actorSelection(ActorPath.fromString("akka://%s/user/%s".format(MEGAMCLOUD_CLUSTER, NODEACTOR))) ! new NodeJob(id)).successNel
           }
         }
         case NodeJob(x) => {
-          log.info("[{}]: >>  {} --> {}", "Slave", "NodeJob", x)
-          log.info("[{}]: >>  {} --> {}", "Slave", "URIS for ZooKeeper", uris)
+          log.info("[{}]: >> {} --> {}", "Slave", "NodeJob", x)
+          log.info("[{}]: >> {} --> {}", "Slave", "URIS for ZooKeeper", uris)
           val zoo = new Zoo(uris, "nodes")
           zoo.create(x, "Request ID started")
         }
         case RecipeJob(x) => {
-          log.info("[{}]: >>  {} --> {}", "Slave", "vault_location", x)
-          val vl = jsonValue(msg)          
-          Validation.fromTryCatch {
-            val s3 = new S3(Tuple2(access_key, secret_key), aws_region)
-            val loc = vaultLocationParser(vl)
-            log.info("[{}]: >>  {} ------------> {}", "Slave", "Download_location", loc)
-            s3.download(recipe_bucket, loc)    
-            val download_loc =  loc.replace(loc.substring(loc.lastIndexOf("/")), "")
-            (new ZipArchive).unZip(recipe_bucket+"/"+loc, recipe_bucket+"/"+download_loc)
-          } leftMap { t: Throwable => t }
+          log.info("[{}]: >> {} --> {}", "Slave", "vault_location", x)
+          val tuple_succ = jsonValue(msg)
+          val vl = tuple_succ._1
+          val repo_file = tuple_succ._2
+          val loc = vaultLocationParser(vl)
+          val download_loc = loc.replace(loc.substring(loc.lastIndexOf("/")), "")
+          Future {            
+            Validation.fromTryCatch {
+              val s3 = new S3(Tuple2(access_key, secret_key), "s3-ap-southeast-1.amazonaws.com")
+              log.info("[{}]: >> {} ------------> {}", "Slave", "Download_location", loc)
+              s3.download(recipe_bucket, loc)
+              (new ZipArchive).unZip(recipe_bucket + "/" + loc, recipe_bucket + "/" + download_loc)
+              (new GitRepository(recipe_bucket + "/" + download_loc + "/" + new File(clone_file_name))).clone(repo_file)
+            } leftMap { t: Throwable =>
+              val u = new java.io.StringWriter
+              t.printStackTrace(new java.io.PrintWriter(u))
+              log.error("[{}]: >> {} --> {}", "Slave-" + id, "Future:Failure", u.toString)
+              t
+            }
+          }
         }
       }
       WorkComplete("done")
