@@ -72,7 +72,7 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  }
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
-  (packageMapping((bd / "target/megam_herk/config/application-production.conf") -> "/usr/local/share/megamherk/config/application.conf")
+  (packageMapping((bd / "target/megam_herk/config/application.conf") -> "/usr/local/share/megamherk/config/application.conf")
    withConfig())
  }
 
