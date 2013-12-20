@@ -43,9 +43,9 @@ class SettingsImpl(config: Config) extends Extension {
   
   val secret_key = config.getString("app.vault.secret_key")
   
-  val recipe_bucket = config.getString("app.vault.recipe_bucket")
+  val recipe_bucket = config.getString("app.vault.recipe_bucket")  
   
-  val aws_region = config.getString("app.vault.aws_region")
+  val clone_file_name = config.getString("app.vault.clone_file_name")
   
   //val megam_home = config.getString("app.vault.megam_home")
   
