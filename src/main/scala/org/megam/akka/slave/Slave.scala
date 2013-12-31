@@ -51,7 +51,7 @@ import java.io.File;
  * requests for status (or) streaming log updates to redis....
  */
 case class MessageJson(code: Int, body: String, time_received: String)
-case class BodyJson(message: String)
+case class BodyJson(id: String)
 case class RecipeBodyJson(vault_loc: String, repo_path: String)
 
 class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
@@ -76,8 +76,8 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         val json = parse(x)
         log.info("[{}]: >> {} --> {}", "Slave", "jsonvalue", json)
         val m = json.extract[MessageJson]
-        val n = (parse(m.body)).extract[BodyJson]
-        val mm = n.message
+        val n = (parse(m.body)).extract[BodyJson]        
+        val mm = n.id        
         Tuple2(mm, "")
       }
       case NodeJob(x) => {
@@ -90,7 +90,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         log.info("[{}]: >> {} --> {}", "Slave", "jsonvalue", json)
         val m = json.extract[MessageJson]
         val n = (parse(m.body)).extract[BodyJson]
-        val l = (parse(n.message)).extract[RecipeBodyJson]
+        val l = (parse(n.id)).extract[RecipeBodyJson]
         Tuple2(l.vault_loc, l.repo_path)
       }
       case None => ("", "")
@@ -143,7 +143,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
           val download_loc = loc.replace(loc.substring(loc.lastIndexOf("/")), "")
           Future {            
             Validation.fromTryCatch {
-              val s3 = new S3(Tuple2(access_key, secret_key), "s3-ap-southeast-1.amazonaws.com")
+              val s3 = new S3(Tuple2(access_key, secret_key))
               log.info("[{}]: >> {} ------------> {}", "Slave", "Download_location", loc)
               s3.download(recipe_bucket, loc)
               (new ZipArchive).unZip(recipe_bucket + "/" + loc, recipe_bucket + "/" + download_loc)
