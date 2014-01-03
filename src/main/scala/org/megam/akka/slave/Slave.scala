@@ -52,6 +52,7 @@ import java.io.File;
  */
 case class MessageJson(code: Int, body: String, time_received: String)
 case class BodyJson(id: String)
+case class RecipeJson(message: String)
 case class RecipeBodyJson(vault_loc: String, repo_path: String)
 
 class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
@@ -89,8 +90,8 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         val json = parse(x)
         log.info("[{}]: >> {} --> {}", "Slave", "jsonvalue", json)
         val m = json.extract[MessageJson]
-        val n = (parse(m.body)).extract[BodyJson]
-        val l = (parse(n.id)).extract[RecipeBodyJson]
+        val n = (parse(m.body)).extract[RecipeJson]
+        val l = (parse(n.message)).extract[RecipeBodyJson]
         Tuple2(l.vault_loc, l.repo_path)
       }
       case None => ("", "")
