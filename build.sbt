@@ -38,20 +38,20 @@ maintainer in Debian:= "Rajthilak <rajthilak@megam.co.in>"
 
 packageSummary := "Cloud Bridge for Megam."
 
-packageDescription in Debian:= "Cloud bridge to cloud manage megam platform. "
+packageDescription in Debian:= "Cloud bridge to manage megam platform. "
 
 debianPackageDependencies in Debian ++= Seq("curl", "java2-runtime", "bash (>= 2.05a-11)")
  
 debianPackageRecommends in Debian += "rabbitmq-server"
 
 linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
- (packageMapping((bd / "bin/start") -> "/usr/local/share/megamherk/bin/start")
+ (packageMapping((bd / "bin/start") -> "/usr/share/megamherk/bin/start")
    withUser "root" withGroup "root" withPerms "0755")
  }
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   val src = bd / "target/megam_herk/lib"
-  val dest = "/usr/local/share/megamherk/lib"
+  val dest = "/usr/share/megamherk/lib"
   LinuxPackageMapping(
     for {
       path <- (src ***).get
@@ -62,7 +62,7 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   val src = bd / "target/megam_herk/deploy"
-  val dest = "/usr/local/share/megamherk/deploy"
+  val dest = "/usr/share/megamherk/deploy"
   LinuxPackageMapping(
     for {
       path <- (src ***).get
@@ -72,19 +72,19 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  }
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
-  (packageMapping((bd / "target/megam_herk/config/application.conf") -> "/usr/local/share/megamherk/config/application.conf")
+  (packageMapping((bd / "target/megam_herk/config/application.conf") -> "/usr/share/megamherk/config/application.conf")
    withConfig())
  }
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  packageMapping(
-    (bd / "copyright") -> "/usr/local/share/megamherk/copyright"
+    (bd / "copyright") -> "/usr/share/megamherk/copyright"
   ) withPerms "0644" asDocs()
  }
 
  linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.sourceDirectory) map { bd =>
   (packageMapping(
-    (bd / "CHANGELOG") -> "/usr/local/share/megamherk/changelog.gz"
+    (bd / "CHANGELOG") -> "/usr/share/megamherk/changelog.gz"
   ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
 }
 
