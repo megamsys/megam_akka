@@ -50,7 +50,7 @@ class CloApp extends Bootable {
   var clo_clusters = Set.empty[Address]
 
   def startup = {
-    println("[MEGAM]: >> Booting up Megam --> Cloud Bridge 0.1")
+    println("[MEGAM]: >> Booting up Megam --> Cloud Herk 0.1")
     val clusterListener = system.actorOf(Props(new Actor with ActorLogging {
       def receive = {
         case state: CurrentClusterState =>

@@ -48,6 +48,12 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  (packageMapping((bd / "bin/start") -> "/usr/share/megamherk/bin/start")
    withUser "root" withGroup "root" withPerms "0755")
  }
+ 
+ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
+ packageMapping(
+    (bd / "logs") -> "/usr/share/megamherk/logs"
+  ) withPerms "0755"
+ }
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   val src = bd / "target/megam_herk/lib"
@@ -81,6 +87,7 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
     (bd / "copyright") -> "/usr/share/megamherk/copyright"
   ) withPerms "0644" asDocs()
  }
+  
 
  linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.sourceDirectory) map { bd =>
   (packageMapping(
@@ -88,11 +95,11 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
 }
 
-mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.1.0")),"0.1/debs/megam_herk.deb"))
+mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.1.0")),"0.1/debs/megamherk.deb"))
 
 host in upload := "megampub.s3.amazonaws.com"
 
-mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.1.0")),"0.1/debs/megam_herk.deb"))
+mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.1.0")),"0.1/debs/megamherk.deb"))
 
 host in download := "megampub.s3.amazonaws.com"
 

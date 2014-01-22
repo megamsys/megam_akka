@@ -45,7 +45,7 @@ object MegamAkkaKernel extends Build {
     crossPaths := false,
     description := Description,
     organizationName := "Megam Systems.",
-    organizationHomepage := Some(url("http://www.megam.co")))
+    organizationHomepage := Some(url("https://www.megam.co")))
 
   lazy val defaultSettings = buildSettings ++ Seq(
     scalacOptions ++= Seq(
