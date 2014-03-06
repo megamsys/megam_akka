@@ -50,6 +50,16 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  }
  
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
+ (packageMapping((bd / "bin/herk_stash") -> "/usr/share/megamherk/bin/herk_stash")
+   withUser "root" withGroup "root" withPerms "0755")
+ }
+ 
+ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
+ (packageMapping((bd / "bin/megamherk.cron.d") -> "/etc/cron.d/megamherk")
+   withUser "root" withGroup "root" withPerms "0755")
+ }
+ 
+ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  packageMapping(
     (bd / "logs") -> "/usr/share/megamherk/logs"
   ) withPerms "0755"
