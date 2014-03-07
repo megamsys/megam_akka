@@ -47,5 +47,10 @@ object MasterWorkerProtocol {
   case class RecipeJob(job: String)
   case class RecipeRes(res: String)
   case class RecipeFail(fail: String, job: RecipeJob)
+  
+  case object StashReg
+  case class StashJob(job: String)
+  case class StashRes(res: String)
+  case class StashFail(fail: String, job: StashJob)
 
 }

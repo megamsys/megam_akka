@@ -39,6 +39,10 @@ class SettingsImpl(config: Config) extends Extension {
   
   val recipe_exchange: String = config.getString("app.amqp.recipe_exchange")
   
+  val stash_queue = config.getString("app.amqp.stash_queue")
+  
+  val stash_exchange: String = config.getString("app.amqp.stash_exchange")
+  
   val access_key = config.getString("app.vault.access_key")
   
   val secret_key = config.getString("app.vault.secret_key")
@@ -46,6 +50,8 @@ class SettingsImpl(config: Config) extends Extension {
   val recipe_bucket = config.getString("app.vault.recipe_bucket")  
   
   val clone_file_name = config.getString("app.vault.clone_file_name")
+  
+  val stash_path = config.getString("app.amqp.stash_path")
   
   //val megam_home = config.getString("app.vault.megam_home")
   

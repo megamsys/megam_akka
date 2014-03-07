@@ -6,4 +6,4 @@
 # Copyright 2014, Megam systems
 #
 MAILTO=""
-*/10 * * * * root @@MEGAM_HOME@@/bin/herk_stash
+*/1 * * * * root @@MEGAM_HOME@@/bin/herk_stash

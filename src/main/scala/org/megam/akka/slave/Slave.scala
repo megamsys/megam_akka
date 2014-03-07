@@ -37,7 +37,9 @@ import org.apache.zookeeper.data.{ ACL, Stat }
 import org.apache.zookeeper.KeeperException
 import org.megam.akka.master.MasterWorkerProtocol._
 import java.net.URI
-import java.io.File;
+import java.io.File
+import java.io.{FileWriter, PrintWriter, BufferedWriter }
+import java.nio.file._
 /**
  * @author ram
  *
@@ -54,6 +56,8 @@ case class MessageJson(code: Int, body: String, time_received: String)
 case class BodyJson(id: String)
 case class RecipeJson(message: String)
 case class RecipeBodyJson(vault_loc: String, repo_path: String)
+case class StashJson(message: String)
+case class StashBodyJson(name: String)
 
 class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   // We'll use the current dispatcher for the execution context.
@@ -67,8 +71,9 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   val uris = settings.ZooUri
   val access_key = settings.access_key
   val secret_key = settings.secret_key
-  val recipe_bucket = settings.recipe_bucket  
+  val recipe_bucket = settings.recipe_bucket
   val clone_file_name = settings.clone_file_name
+  val filePathString = settings.stash_path
   //val megam_home = settings.megam_home
 
   def jsonValue(msg: Any): Tuple2[String, String] = {
@@ -77,14 +82,21 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         val json = parse(x)
         log.info("[{}]: >> {} --> {}", "Slave", "jsonvalue", json)
         val m = json.extract[MessageJson]
-        val n = (parse(m.body)).extract[BodyJson]        
-        val mm = n.id        
+        val n = (parse(m.body)).extract[BodyJson]
+        val mm = n.id
         Tuple2(mm, "")
       }
       case NodeJob(x) => {
         val json = parse(x)
         val m = json.extract[MessageJson]
         Tuple2(m.body, "")
+      }
+      case StashJob(x) => {
+        val json = parse(x)
+        val m = json.extract[MessageJson]
+        val n = (parse(m.body)).extract[StashJson]
+        val l = (parse(n.message)).extract[StashBodyJson]
+        Tuple2(l.name, "")
       }
       case RecipeJob(x) => {
         val json = parse(x)
@@ -109,6 +121,12 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
     email + cts + file
   }
 
+  def filewriter(path: String, text: String) = {    
+   val fw = new FileWriter(path,true) //the true will append the new data
+    fw.write("\n"+text)//appends the string to the file
+    fw.close()
+  }
+  
   def doWork(workSender: ActorRef, msg: Any): Unit = {
     Future {
       msg match {
@@ -135,6 +153,18 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
           val zoo = new Zoo(uris, "nodes")
           zoo.create(x, "Request ID started")
         }
+        case StashJob(x) => {
+          log.info("[{}]: >> {} --> {}", "Slave", "StashJob", x)
+          val tuple_succ = jsonValue(msg)          
+          val path = Paths.get(filePathString)
+          if (!Files.exists(path)) {            
+            val f = new File(filePathString)    
+            filewriter(filePathString, tuple_succ._1)
+          }
+          else {           
+            filewriter(filePathString, tuple_succ._1)
+          }
+        }
         case RecipeJob(x) => {
           log.info("[{}]: >> {} --> {}", "Slave", "vault_location", x)
           val tuple_succ = jsonValue(msg)
@@ -142,7 +172,7 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
           val repo_file = tuple_succ._2
           val loc = vaultLocationParser(vl)
           val download_loc = loc.replace(loc.substring(loc.lastIndexOf("/")), "")
-          Future {            
+          Future {
             Validation.fromTryCatch {
               val s3 = new S3(Tuple2(access_key, secret_key))
               log.info("[{}]: >> {} ------------> {}", "Slave", "Download_location", loc)

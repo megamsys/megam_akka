@@ -30,5 +30,6 @@ object Constants {
   val GULPMASTER = "gulpmaster"
   val WATCHACTOR = "watchactor"
   val CLOUDRECIPEACTOR ="cloudrecipeactor"
-  val WORKER_COUNT = 6
+  val RIAKSTASHACTOR = "riakstashactor"
+  val WORKER_COUNT = 8
 }

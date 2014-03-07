@@ -1,0 +1,162 @@
+Available subcommands: (for details, knife SUB-COMMAND --help)
+
+** BOOTSTRAP COMMANDS **
+knife bootstrap FQDN (options)
+knife bootstrap windows ssh FQDN (options)
+knife bootstrap windows winrm FQDN (options)
+
+** CLIENT COMMANDS **
+knife client bulk delete REGEX (options)
+knife client create CLIENT (options)
+knife client delete CLIENT (options)
+knife client edit CLIENT (options)
+knife client list (options)
+knife client reregister CLIENT (options)
+knife client show CLIENT (options)
+
+** CONFIGURE COMMANDS **
+knife configure (options)
+knife configure client DIRECTORY
+
+** COOKBOOK COMMANDS **
+knife cookbook bulk delete REGEX (options)
+knife cookbook create COOKBOOK (options)
+knife cookbook delete COOKBOOK VERSION (options)
+knife cookbook download COOKBOOK [VERSION] (options)
+knife cookbook list (options)
+knife cookbook metadata COOKBOOK (options)
+knife cookbook metadata from FILE (options)
+knife cookbook show COOKBOOK [VERSION] [PART] [FILENAME] (options)
+knife cookbook test [COOKBOOKS...] (options)
+knife cookbook upload [COOKBOOKS...] (options)
+
+** COOKBOOK SITE COMMANDS **
+knife cookbook site download COOKBOOK [VERSION] (options)
+knife cookbook site install COOKBOOK [VERSION] (options)
+knife cookbook site list (options)
+knife cookbook site search QUERY (options)
+knife cookbook site share COOKBOOK CATEGORY (options)
+knife cookbook site show COOKBOOK [VERSION] (options)
+knife cookbook site unshare COOKBOOK
+
+** DATA BAG COMMANDS **
+knife data bag create BAG [ITEM] (options)
+knife data bag delete BAG [ITEM] (options)
+knife data bag edit BAG ITEM (options)
+knife data bag from file BAG FILE|FOLDER [FILE|FOLDER..] (options)
+knife data bag list (options)
+knife data bag show BAG [ITEM] (options)
+
+** EC2 COMMANDS **
+knife ec2 flavor list (options)
+knife ec2 instance data (options)
+knife ec2 server create (options)
+knife ec2 server delete SERVER [SERVER] (options)
+knife ec2 server list (options)
+
+** ENVIRONMENT COMMANDS **
+knife environment create ENVIRONMENT (options)
+knife environment delete ENVIRONMENT (options)
+knife environment edit ENVIRONMENT (options)
+knife environment from file FILE [FILE..] (options)
+knife environment list (options)
+knife environment show ENVIRONMENT (options)
+
+** EXEC COMMANDS **
+knife exec [SCRIPT] (options)
+
+** GOOGLE COMMANDS **
+knife google disk create NAME --google-disk-sizeGb N --google-compute-zone ZONE (options)
+knife google disk delete NAME --google-compute-zone ZONE
+knife google disk list --google-compute-zone ZONE (options)
+knife google server create NAME -m MACHINE_TYPE -I IMAGE -Z ZONE (options)
+knife google server delete SERVER [SERVER] --google-compute-zone ZONE (options)
+knife google server list --google-compute-zone ZONE (options)
+knife google setup
+knife google zone list (options)
+
+** HELP COMMANDS **
+knife help [list|TOPIC]
+
+** HP COMMANDS **
+knife hp flavor list (options)
+knife hp group list (options)
+knife hp image list (options)
+knife hp server create (options)
+knife hp server delete SERVER [SERVER] (options)
+knife hp server list (options)
+
+** INDEX COMMANDS **
+knife index rebuild (options)
+
+** KNIFE COMMANDS **
+Usage: /home/rajthilak/.rvm/gems/ruby-2.1.0-preview2/bin/knife (options)
+
+** NODE COMMANDS **
+knife node bulk delete REGEX (options)
+knife node create NODE (options)
+knife node delete NODE (options)
+knife node edit NODE (options)
+knife node from file FILE (options)
+knife node list (options)
+knife node run_list add [NODE] [ENTRY[,ENTRY]] (options)
+knife node run_list remove [NODE] [ENTRIES] (options)
+knife node run_list set NODE ENTRIES (options)
+knife node show NODE (options)
+
+** PATH-BASED COMMANDS **
+knife delete [PATTERN1 ... PATTERNn]
+knife deps PATTERN1 [PATTERNn]
+knife diff PATTERNS
+knife download PATTERNS
+knife edit [PATTERN1 ... PATTERNn]
+knife list [-dfR1p] [PATTERN1 ... PATTERNn]
+knife show [PATTERN1 ... PATTERNn]
+knife upload PATTERNS
+knife xargs [COMMAND]
+
+** RAW COMMANDS **
+knife raw REQUEST_PATH
+
+** RECIPE COMMANDS **
+knife recipe list [PATTERN]
+
+** ROLE COMMANDS **
+knife role bulk delete REGEX (options)
+knife role create ROLE (options)
+knife role delete ROLE (options)
+knife role edit ROLE (options)
+knife role from file FILE [FILE..] (options)
+knife role list (options)
+knife role show ROLE (options)
+
+** SEARCH COMMANDS **
+knife search INDEX QUERY (options)
+
+** SSH COMMANDS **
+knife ssh QUERY COMMAND (options)
+
+** STATUS COMMANDS **
+knife status QUERY (options)
+
+** TAG COMMANDS **
+knife tag create NODE TAG ...
+knife tag delete NODE TAG ...
+knife tag list NODE
+
+** USER COMMANDS **
+knife user create USER (options)
+knife user delete USER (options)
+knife user edit USER (options)
+knife user list (options)
+knife user reregister USER (options)
+knife user show USER (options)
+
+** WINDOWS COMMANDS **
+knife bootstrap windows winrm FQDN (options)
+knife bootstrap windows ssh FQDN (options)
+knife winrm QUERY COMMAND (options)
+
+** WINRM COMMANDS **
+knife winrm QUERY COMMAND (options)
+

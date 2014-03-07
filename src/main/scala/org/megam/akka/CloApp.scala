@@ -68,7 +68,8 @@ class CloApp extends Bootable {
     //Every cluster[megamcloud_cluster] starts with a closervice and master=><x number of workers>     
     system.actorOf(Props[CloService], name = CLOSERVICE)    
     system.actorOf(Props[CloudRecipeActor], name = CLOUDRECIPEACTOR)
-    system.actorOf(Props[CloMaster], name = CLOMASTER)
+    system.actorOf(Props[RiakStashActor], name = RIAKSTASHACTOR)
+    system.actorOf(Props[CloMaster], name = CLOMASTER)    
 
     println("[MEGAM]: >> Clo Workers -----------------------------> %d")
     val clo_workers = 1 to WORKER_COUNT map { x => worker(CLOMASTER) }
