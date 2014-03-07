@@ -1,0 +1,37 @@
+#!/bin/bash
+# this script gets activated via a cron to sequentially cleanup riak nodes 
+# when it receives a message to do so.
+#
+# Megam.  http://www.gomegam.com
+#
+# Copyright 2014, Megam systems
+#
+
+MEGAM_AKKA_CONF_DIR=$MEGAM_HOME/.megam
+MEGAM_AKKA_LOGS_DIR=$MEGAM_HOME/logs
+cd $MEGAM_AKKA_CONF_DIR
+
+# here it records all the stash messages made through the interface
+riakstash_file=$MEGAM_AKKA_CONF_DIR/riakstash
+
+#test for existence of the riakstash file
+if [ -f $riakstash_file ]
+then
+  #read through the file
+  while read line
+  do
+    echo $line
+    curl -X DELETE http://api.megam.co:8098/riak/nodes/$line
+    if [ $? == 0 ]; then
+        echo "*-----------------------------------------------------------------------*"  >> /var/log/upstart/herk.log 
+    	echo "cron herk_stash => deleted riak: $line" >> /var/log/upstart/herk.log
+        rm -r -f $MEGAM_AKKA_LOGS_DIR/$line	
+   	echo "cron herk_stash => deleted  log: $line" >> /var/log/upstart/herk.log
+        echo "*-----------------------------------------------------------------------*"  >> /var/log/upstart/herk.log
+    else
+     	echo "cron herk_stash => delete failed : $line" >> /var/log/upstart/herk.log	
+    fi
+  done < $riakstash_file
+else 
+  echo "$riakstash_file not found"  >> /var/log/upstart/herk.log 
+fi

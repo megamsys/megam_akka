@@ -44,7 +44,18 @@ debianPackageDependencies in Debian ++= Seq("curl", "java2-runtime", "bash (>= 2
  
 debianPackageRecommends in Debian += "rabbitmq-server"
 
-linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
+
+ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
+ (packageMapping((bd / "bin/herk_stash") -> "/usr/share/megamherk/bin/herk_stash")
+   withUser "root" withGroup "root" withPerms "0755")
+ }
+ 
+ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
+ (packageMapping((bd / "bin/megamherk.cron.d") -> "/etc/cron.d/megamherk_riakstash")
+   withUser "root" withGroup "root" withPerms "0644")
+ }
+ 
+ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  (packageMapping((bd / "bin/start") -> "/usr/share/megamherk/bin/start")
    withUser "root" withGroup "root" withPerms "0755")
  }
