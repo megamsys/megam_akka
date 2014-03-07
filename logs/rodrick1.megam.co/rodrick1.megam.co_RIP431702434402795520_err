@@ -1,1 +1,0 @@
-FATAL: Cannot find sub command for: 'profitbricks server create --run-list 'role[java]' --name rodrick1.megam.co -S ubuntu13.04-Snapshot-02/06/2014 --identity-file cloudkeys/tom@cat.com/sample.key --data-center megam --ram 1024 --public-key-file cloudkeys/tom@cat.com/sample.pub --image-password team4megam --cpus 1 -x root -A rad@wayzinfratek.com -K Gomeg@mpb'
