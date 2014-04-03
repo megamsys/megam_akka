@@ -24,8 +24,8 @@ import akka.sbt.AkkaKernelPlugin.{ Dist, outputDirectory, distJvmOptions, additi
 object MegamAkkaKernel extends Build {
 
   val Organization = "org.megam"
-  val Version = "0.1.0"
-  val ScalaVersion = "2.10.3"
+  val Version = "0.3.0"
+  val ScalaVersion = "2.10.4"
   val Description = "Cloud bridge to cloud manage megam platform."
 
   lazy val megamAkka = Project(
@@ -69,7 +69,7 @@ object HerkResolvers {
   val sonasp = "Sonatype Snapshots" at Opts.resolver.sonatypeSnapshots.root
   val sonarl = "Sonatype Releases" at Opts.resolver.sonatypeStaging.root
   val scatsp = "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
-  val All = Seq(akkasp, typesp, sonasp, sonarl, scatsp)
+  val All = Seq(akkasp, typesp, sonarl, sonasp, scatsp)
 }
 
 object Dependencies {
@@ -82,9 +82,9 @@ object Dependencies {
 object Dependency {
   // Versions
   object V {
-    val Akka = "2.3.0"
-    val Mg = "0.1.0"
-    val Mg_SNST = "0.1.0-SNAPSHOT"
+    val Akka = "2.3.1"
+    val Mg = "0.3.0"
+    val Mg_SNST = "0.3.0-SNAPSHOT"
 
   }
   val snowflake = "com.twitter.service" % "snowflake" % "1.0.2" from "https://s3-ap-southeast-1.amazonaws.com/megampub/0.1/jars/snowflake.jar"
@@ -94,6 +94,6 @@ object Dependency {
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % V.Akka
   val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % V.Akka
   val sigar = "org.fusesource" % "sigar" % "1.6.4"
-  val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg_SNST
+  val mg = "com.github.indykish" % "megam_common_2.10" % V.Mg
   val mc = "com.github.indykish" % "megam_chef" % V.Mg_SNST
 }
