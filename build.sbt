@@ -106,11 +106,11 @@ debianPackageRecommends in Debian += "rabbitmq-server"
   ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
 }
 
-mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.1.0")),"0.1/debs/megamherk.deb"))
+mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.3.0")),"0.3/debs/megamherk.deb"))
 
 host in upload := "megampub.s3.amazonaws.com"
 
-mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.1.0")),"0.1/debs/megamherk.deb"))
+mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.3.0")),"0.3/debs/megamherk.deb"))
 
 host in download := "megampub.s3.amazonaws.com"
 
