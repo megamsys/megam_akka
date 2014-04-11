@@ -82,7 +82,7 @@ object Dependencies {
 object Dependency {
   // Versions
   object V {
-    val Akka = "2.3.1"
+    val Akka = "2.3.2"
     val Mg = "0.3.0"
     val Mg_SNST = "0.3.0-SNAPSHOT"
 
