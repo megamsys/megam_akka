@@ -40,7 +40,7 @@ packageSummary := "Cloud Bridge for Megam."
 
 packageDescription in Debian:= "Cloud bridge to manage megam platform. "
 
-debianPackageDependencies in Debian ++= Seq("curl", "java2-runtime", "bash (>= 2.05a-11)")
+debianPackageDependencies in Debian ++= Seq("curl",  "bash (>= 2.05a-11)")
  
 debianPackageRecommends in Debian += "rabbitmq-server"
 

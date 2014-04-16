@@ -24,7 +24,7 @@ import akka.sbt.AkkaKernelPlugin.{ Dist, outputDirectory, distJvmOptions, additi
 object MegamAkkaKernel extends Build {
 
   val Organization = "org.megam"
-  val Version = "0.3.0"
+  val Version = "0.4.0"
   val ScalaVersion = "2.10.4"
   val Description = "Cloud bridge to cloud manage megam platform."
 
@@ -83,8 +83,8 @@ object Dependency {
   // Versions
   object V {
     val Akka = "2.3.2"
-    val Mg = "0.3.0"
-    val Mg_SNST = "0.3.0-SNAPSHOT"
+    val Mg = "0.4.0"
+    val Mg_SNST = "0.4.0-SNAPSHOT"
 
   }
   val snowflake = "com.twitter.service" % "snowflake" % "1.0.2" from "https://s3-ap-southeast-1.amazonaws.com/megampub/0.1/jars/snowflake.jar"
