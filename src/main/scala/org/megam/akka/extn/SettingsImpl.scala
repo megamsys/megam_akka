@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright [2012-2013] [Megam Systems]
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,46 +28,40 @@ import com.typesafe.config.Config
 class SettingsImpl(config: Config) extends Extension {
 
   val AMQPUri: String = config.getString("app.amqp.uris")
-  
+
   val exchange: String = config.getString("app.amqp.exchange")
-  
+
   val queue: String = config.getString("app.amqp.queue")
- 
+
   val ZooUri: String = config.getString("app.zoo.uris")
-  
+
   val recipe_queue = config.getString("app.amqp.recipe_queue")
-  
+
   val recipe_exchange: String = config.getString("app.amqp.recipe_exchange")
-  
+
   val stash_queue = config.getString("app.amqp.stash_queue")
-  
+
   val stash_exchange: String = config.getString("app.amqp.stash_exchange")
-  
+
   val access_key = config.getString("app.vault.access_key")
-  
+
   val secret_key = config.getString("app.vault.secret_key")
-  
-  val recipe_bucket = config.getString("app.vault.recipe_bucket")  
-  
+
+  val recipe_bucket = config.getString("app.vault.recipe_bucket")
+
   val clone_file_name = config.getString("app.vault.clone_file_name")
-  
+
   val stash_path = config.getString("app.amqp.stash_path")
-  
-  //val megam_home = config.getString("app.vault.megam_home")
-  
+
   //val TotalWorker: Int = config.getInt("app.worker.totalworkers")
-  
+
 }
 
 object Settings extends ExtensionId[SettingsImpl] with ExtensionIdProvider {
-  
+
   override def lookup = Settings
-  
-  override def createExtension(system: ExtendedActorSystem) = new SettingsImpl(system.settings.config) 
-  
-  
+
+  override def createExtension(system: ExtendedActorSystem) = new SettingsImpl(system.settings.config)
+
+
 }
-
-
-
-

@@ -2,11 +2,8 @@ import sbt._
 import Process._
 import com.typesafe.sbt.packager.debian.Keys._
 import com.typesafe.sbt.packager.linux.LinuxPackageMapping
-import S3._
 
 seq(packagerSettings:_*)
-
-s3Settings
 
 scalaVersion := "2.10.4"
 
@@ -26,49 +23,55 @@ scalacOptions := Seq(
   	"-language:implicitConversions",
   	"-Ydead-code")
 
-com.typesafe.sbt.packager.debian.Keys.name in Debian := "megamherk"
+com.typesafe.sbt.packager.debian.Keys.name in Debian := "megamd"
 
 com.typesafe.sbt.packager.debian.Keys.version in Debian <<= (com.typesafe.sbt.packager.debian.Keys.version, sbt.Keys.version) apply { (v, sv) =>
       val nums = (v split "[^\\d]")
       "%s" format (sv)
     }
- 
- 
+
+
 maintainer in Debian:= "Rajthilak <rajthilak@megam.co.in>"
 
-packageSummary := "Cloud Bridge for Megam."
+packageSummary := "The engine for Megam."
 
-packageDescription in Debian:= "Cloud bridge to manage megam platform. "
+packageDescription in Debian:= "Cloud engine to automate on Megam platform. "
 
-debianPackageDependencies in Debian ++= Seq("curl",  "bash (>= 2.05a-11)")
- 
+debianPackageDependencies in Debian ++= Seq("curl", "openjdk-7-jre-headless",  "bash (>= 2.05a-11)")
+
 debianPackageRecommends in Debian += "rabbitmq-server"
 
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
- (packageMapping((bd / "bin/herk_stash") -> "/usr/share/megamherk/bin/herk_stash")
-   withUser "root" withGroup "root" withPerms "0755")
+ (packageMapping((bd / "bin/herk_stash") -> "/var/lib/megam/megamd/herk_stash")
+   withUser "megam" withGroup "megam" withPerms "0755")
  }
- 
+
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  (packageMapping((bd / "bin/megamherk.cron.d") -> "/etc/cron.d/megamherk_riakstash")
-   withUser "root" withGroup "root" withPerms "0644")
+   withUser "megam" withGroup "megam" withPerms "0644")
  }
- 
+
+linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
+(packageMapping((bd / "bin/env.sh") -> "/var/lib/megam/megamd/env.sh")
+	withUser "megam" withGroup "megam" withPerms "0644")
+}
+
+
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
- (packageMapping((bd / "bin/start") -> "/usr/share/megamherk/bin/start")
-   withUser "root" withGroup "root" withPerms "0755")
+ (packageMapping((bd / "bin/start") -> "/usr/share/megam/megamd/bin/start")
+   withUser "megam" withGroup "megam" withPerms "0755")
  }
- 
+
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  packageMapping(
-    (bd / "logs") -> "/usr/share/megamherk/logs"
+    (bd / "logs") -> "/var/lib/megam/megamd/logs"
   ) withPerms "0755"
  }
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   val src = bd / "target/megam_herk/lib"
-  val dest = "/usr/share/megamherk/lib"
+  val dest = "/usr/share/megam/megamd/lib"
   LinuxPackageMapping(
     for {
       path <- (src ***).get
@@ -79,7 +82,7 @@ debianPackageRecommends in Debian += "rabbitmq-server"
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   val src = bd / "target/megam_herk/deploy"
-  val dest = "/usr/share/megamherk/deploy"
+  val dest = "/usr/share/megam/megamd/deploy"
   LinuxPackageMapping(
     for {
       path <- (src ***).get
@@ -89,33 +92,25 @@ debianPackageRecommends in Debian += "rabbitmq-server"
  }
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
-  (packageMapping((bd / "target/megam_herk/config/application.conf") -> "/usr/share/megamherk/config/application.conf")
+  (packageMapping((bd / "target/megam_herk/config/application.conf") -> "/usr/share/megam/megamd/config/application.conf")
    withConfig())
  }
 
  linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
  packageMapping(
-    (bd / "copyright") -> "/usr/share/megamherk/copyright"
+    (bd / "copyright") -> "/usr/share/megam/megamd/copyright"
   ) withPerms "0644" asDocs()
  }
-  
 
- linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.sourceDirectory) map { bd =>
+
+ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   (packageMapping(
-    (bd / "CHANGELOG") -> "/usr/share/megamherk/changelog.gz"
-  ) withUser "root" withGroup "root" withPerms "0644" gzipped) asDocs()
+    (bd / "CHANGELOG") -> "/usr/share/megam/megamd/changelog.gz"
+  ) withUser "megam" withGroup "megam" withPerms "0644" gzipped) asDocs()
 }
 
-mappings in upload := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.3.0")),"0.3/debs/megamherk.deb"))
-
-host in upload := "megampub.s3.amazonaws.com"
-
-mappings in download := Seq((new java.io.File(("%s-%s.deb") format("target/megamherk", "0.3.0")),"0.3/debs/megamherk.deb"))
-
-host in download := "megampub.s3.amazonaws.com"
-
-host in delete := "megampub.s3.amazonaws.com"
-
-credentials += Credentials(Path.userHome / "software" / "aws" / "keys" / "sbt_s3_keys")
-
-S3.progress in S3.upload := true
+linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.sourceDirectory) map { bd =>
+  (packageMapping(
+    (bd / "templates/etc/init/megamd") -> "/etc/init/megamd")
+		withUser "megam" withGroup "megam" withPerms "0755")
+}

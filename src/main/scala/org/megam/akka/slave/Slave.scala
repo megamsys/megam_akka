@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright [2012-2013] [Megam Systems]
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,7 +74,6 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
   val recipe_bucket = settings.recipe_bucket
   val clone_file_name = settings.clone_file_name
   val filePathString = settings.stash_path
-  //val megam_home = settings.megam_home
 
   def jsonValue(msg: Any): Tuple2[String, String] = {
     msg match {
@@ -121,12 +120,12 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
     email + cts + file
   }
 
-  def filewriter(path: String, text: String) = {    
+  def filewriter(path: String, text: String) = {
    val fw = new FileWriter(path,true) //the true will append the new data
     fw.write("\n"+text)//appends the string to the file
     fw.close()
   }
-  
+
   def doWork(workSender: ActorRef, msg: Any): Unit = {
     Future {
       msg match {
@@ -155,13 +154,13 @@ class Slave(masterLocation: ActorPath) extends AbstractSlave(masterLocation) {
         }
         case StashJob(x) => {
           log.info("[{}]: >> {} --> {}", "Slave", "StashJob", x)
-          val tuple_succ = jsonValue(msg)          
+          val tuple_succ = jsonValue(msg)
           val path = Paths.get(filePathString)
-          if (!Files.exists(path)) {            
-            val f = new File(filePathString)    
+          if (!Files.exists(path)) {
+            val f = new File(filePathString)
             filewriter(filePathString, tuple_succ._1)
           }
-          else {           
+          else {
             filewriter(filePathString, tuple_succ._1)
           }
         }
