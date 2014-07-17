@@ -54,7 +54,7 @@ debianPackageRecommends in Debian += "rabbitmq-server"
 
 linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
 (packageMapping((bd / "bin/env.sh") -> "/var/lib/megam/megamd/env.sh")
-	withUser "megam" withGroup "megam" withPerms "0644")
+	withUser "megam" withGroup "megam" withPerms "755")
 }
 
 
@@ -111,6 +111,6 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
 
 linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.sourceDirectory) map { bd =>
   (packageMapping(
-    (bd / "templates/etc/init/megamd") -> "/etc/init/megamd")
+    (bd / "templates/etc/init/megamd") -> "/etc/init/megamd.conf")
 		withUser "megam" withGroup "megam" withPerms "0755")
 }
