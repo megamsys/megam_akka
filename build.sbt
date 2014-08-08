@@ -111,6 +111,6 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
 
 linuxPackageMappings in Debian <+= (com.typesafe.sbt.packager.debian.Keys.sourceDirectory) map { bd =>
   (packageMapping(
-    (bd / "templates/etc/init/megamd") -> "/etc/init/megamd.conf")
+    (bd / "templates/etc/init/megamd.conf") -> "/etc/init/megamd.conf")
 		withUser "megam" withGroup "megam" withPerms "0755")
 }
