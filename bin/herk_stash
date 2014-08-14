@@ -18,23 +18,23 @@ riakstash_file=$MEGAMD_HOME_DIR/riakstash
 #test for existence of the riakstash file
 if [ -f $riakstash_file ]
 then
-  echo "if entry" >> /var/log/megam/megamd/herk.log
+  echo "if entry" >> /var/log/megam/megamd/megamd.log
   #read through the file
   while read line
   do
-    echo $line >> /var/log/megam/megamd/herk.log
+    echo $line >> /var/log/megam/megamd/megamd.log
     curl --connect-timeout 10 -X DELETE http://localhost:8098/riak/nodes/$line
-    echo $? >> /var/log/megam/megamd/herk.log
+    echo $? >> /var/log/megam/megamd/megamd.log
     if [ $? == 0 ]; then
       echo "*-----------------------------------------------------------------------*"  >> /var/log/upstart/herk.log
-    	echo "cron herk_stash => deleted riak: $line" >> /var/log/megam/megamd/herk.log
+    	echo "cron herk_stash => deleted riak: $line" >> /var/log/megam/megamd/megamd.log
       rm -r -f $MEGAMD_LOGS_DIR/$line
-   	  echo "cron herk_stash => deleted  log: $line" >> /var/log/megam/megamd/herk.log
+   	  echo "cron herk_stash => deleted  log: $line" >> /var/log/megam/megamd/megamd.log
       echo "*-----------------------------------------------------------------------*"  >> /var/log/upstart/herk.log
     else
-     	echo "cron herk_stash => delete failed : $line" >> /var/log/megam/megamd/herk.log
+     	echo "cron herk_stash => delete failed : $line" >> /var/log/megam/megamd/megamd.log
     fi
   done < $riakstash_file
 else
-  echo "$riakstash_file not found"  >> /var/log/megam/megamd/herk.log
+  echo "$riakstash_file not found"  >> /var/log/megam/megamd/megamd.log
 fi
