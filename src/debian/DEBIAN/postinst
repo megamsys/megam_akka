@@ -10,3 +10,5 @@ do
         shift;
 done
 
+start megamd
+
