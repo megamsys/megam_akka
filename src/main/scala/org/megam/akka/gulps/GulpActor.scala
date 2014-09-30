@@ -119,7 +119,7 @@ class GulpActor extends Actor with ActorLogging {
         self ! new GulpJob(result.getOrElse("none-gulpres"))
         result.successNel
       }
-      case None => new java.lang.Error("I received nothing in the amqp response for my subscription, contains invalid JSON. counldn't parse it.").failNel
+      case None => new java.lang.Error("I received nothing in the amqp response for my subscription, contains invalid JSON. counldn't parse it.").failureNel
     }
     res
   }

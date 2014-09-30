@@ -118,7 +118,7 @@ class CloService extends Actor with ActorLogging {
         log.info("[{}]: >>  {} --> {}", "CloService", findMe + "qThirst", "Received some")
         result.some.successNel
       }
-      case None => new java.lang.Error("I received nothing in the amqp response for my subscription, contains invalid JSON. counldn't parse it.").failNel
+      case None => new java.lang.Error("I received nothing in the amqp response for my subscription, contains invalid JSON. counldn't parse it.").failureNel
     }
     res
   }
